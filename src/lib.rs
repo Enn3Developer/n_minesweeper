@@ -13,6 +13,9 @@ pub struct Flag {
     cell: Option<Cell>,
 }
 
+#[derive(Component)]
+pub struct Visible;
+
 #[derive(Component, Eq, PartialEq, Debug, Clone)]
 pub struct Cell {
     x: u32,
@@ -182,7 +185,7 @@ pub fn grid_setup(
 
 pub fn check_cell(
     windows: Query<&Window>,
-    cells: Query<(Entity, &Cell), Without<Flag>>,
+    cells: Query<(Entity, &Cell, Option<&Flag>)>,
     cameras: Query<(&Camera, &GlobalTransform)>,
     grid: Res<Grid>,
     mut text_grid: ResMut<TextGrid>,
@@ -201,7 +204,7 @@ pub fn check_cell(
     {
         let clicked_cell = grid.global_to_grid(world_position.x, world_position.y);
         let clicked = cells.iter().find(
-            |(_entity, cell)| {
+            |(_entity, cell, _)| {
                 if &&clicked_cell == cell {
                     true
                 } else {
@@ -209,13 +212,13 @@ pub fn check_cell(
                 }
             },
         );
-        let mut center_cell = clicked;
+        let mut center_cell = clicked.map(|(entity, cell, flag)| (entity, cell, flag, true));
         let mut trying = vec![];
         let mut tried = vec![];
-        while let Some((checking_entity, checking_cell)) = center_cell {
+        while let Some((checking_entity, checking_cell, flag, check_others)) = center_cell {
             tried.push(checking_cell);
-            if grid.is_bomb_cell(checking_cell) {
-                println!("bomb");
+            if grid.is_bomb_cell(checking_cell) || flag.is_some() {
+                println!("bomb or flag");
                 center_cell = trying.pop();
                 continue;
             }
@@ -233,20 +236,9 @@ pub fn check_cell(
                         checking_cell,
                     );
                 }
-            } else {
-                check_cells(
-                    &cells,
-                    checking_cell,
-                    &tried,
-                    &grid,
-                    &mut text_grid,
-                    &mut commands,
-                    style.clone(),
-                    color.clone(),
-                    &mut trying,
-                );
+            } else if check_others {
+                check_cells(&cells, checking_cell, &tried, &grid, &mut trying);
             }
-
             change_color(&mut commands, checking_entity, color.clone());
             center_cell = trying.pop();
         }
@@ -256,7 +248,7 @@ pub fn check_cell(
 pub fn add_flag(
     windows: Query<&Window>,
     cameras: Query<(&Camera, &GlobalTransform)>,
-    cells: Query<(Entity, &Cell), Without<Flag>>,
+    cells: Query<(Entity, &Cell), (Without<Flag>, Without<Visible>)>,
     grid: Res<Grid>,
     mut commands: Commands,
     server: Res<AssetServer>,
