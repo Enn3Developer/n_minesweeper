@@ -259,12 +259,14 @@ pub fn add_flag(
     cells: Query<(Entity, &Cell), Without<Flag>>,
     grid: Res<Grid>,
     mut commands: Commands,
+    server: Res<AssetServer>,
 ) {
     let window = windows.single();
     let (camera, transform) = cameras.single();
     let mut style = TextStyle::default();
     style.color = Color::BLACK;
     style.font_size = 24.0;
+    style.font = server.load("fonts/NotoEmoji.ttf");
     if let Some(world_position) = window
         .cursor_position()
         .and_then(|cursor| camera.viewport_to_world_2d(transform, cursor))
@@ -272,7 +274,7 @@ pub fn add_flag(
         let clicked_cell = grid.global_to_grid(world_position.x, world_position.y);
         if let Some((entity, cell)) = cells.iter().find(|(_, other)| &&clicked_cell == other) {
             commands.entity(entity).insert(Flag::default());
-            spawn_text(&mut commands, style, "⚑", grid.grid_to_global(cell)).insert(Flag {
+            spawn_text(&mut commands, style, "🚩", grid.grid_to_global(cell)).insert(Flag {
                 cell: Some(cell.clone()),
             });
         }
