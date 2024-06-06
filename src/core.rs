@@ -63,16 +63,7 @@ pub fn check_cells<'a>(
         .filter(|(_, cell, _)| checking_cell.is_near(cell))
         .filter(|(_, cell, _)| !tried.contains(cell))
         .for_each(|(entity, cell, flag)| {
-            trying.push((
-                entity,
-                cell,
-                flag,
-                if grid.is_bomb_cell(cell) {
-                    false
-                } else {
-                    get_bombs(cells, cell, grid) == 0
-                },
-            ));
+            trying.push((entity, cell, flag, get_bombs(cells, cell, grid) == 0));
         });
 }
 
