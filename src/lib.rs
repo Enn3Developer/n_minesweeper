@@ -211,7 +211,6 @@ pub fn check_cell(
                                     .filter(|(_, maybe_bomb)| grid.is_bomb_cell(maybe_bomb))
                                     .map(|(_, cell)| cell)
                                     .collect::<Vec<&Cell>>();
-                                println!("bombs {bomb_cells:?}");
                                 if !bomb_cells.is_empty() {
                                     let pos = grid.grid_to_global(cell);
                                     commands.spawn(Text2dBundle {
