@@ -10,7 +10,8 @@ fn main() {
             Update,
             (
                 check_cell.run_if(input_just_pressed(MouseButton::Left)),
-                (add_flag, remove_flag).run_if(input_just_pressed(MouseButton::Right)),
+                add_flag.run_if(input_just_pressed(MouseButton::Right)),
+                remove_flag.run_if(input_just_pressed(MouseButton::Right)),
             ),
         );
     app.run();
