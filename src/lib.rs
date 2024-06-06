@@ -1,9 +1,15 @@
+mod core;
+
+use crate::core::{change_cell_near_bomb, change_color, check_cells, get_bombs};
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
 use rand::distributions::Uniform;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
+
+#[derive(Component, Debug)]
+pub struct Flag {}
 
 #[derive(Component, Eq, PartialEq, Debug, Clone)]
 pub struct Cell {
@@ -174,7 +180,7 @@ pub fn grid_setup(
 
 pub fn check_cell(
     windows: Query<&Window>,
-    cells: Query<(Entity, &Cell)>,
+    cells: Query<(Entity, &Cell), Without<Flag>>,
     cameras: Query<(&Camera, &GlobalTransform)>,
     grid: Res<Grid>,
     mut text_grid: ResMut<TextGrid>,
@@ -243,73 +249,4 @@ pub fn check_cell(
             center_cell = trying.pop();
         }
     }
-}
-
-fn get_bombs(cells: &Query<(Entity, &Cell)>, checking_cell: &Cell, grid: &Grid) -> u32 {
-    cells
-        .iter()
-        .filter(|(_, cell)| checking_cell.is_near(cell))
-        .filter(|(_, cell)| grid.is_bomb_cell(cell))
-        .count() as u32
-}
-
-fn change_cell_near_bomb(
-    grid: &Grid,
-    text_grid: &mut TextGrid,
-    commands: &mut Commands,
-    bomb_cells: u32,
-    style: TextStyle,
-    cell: &Cell,
-) {
-    let pos = grid.grid_to_global(cell);
-    commands.spawn(Text2dBundle {
-        text: Text {
-            sections: vec![TextSection::new(bomb_cells.to_string(), style)],
-            ..default()
-        },
-        transform: Transform::from_xyz(pos.0, pos.1, 1.0),
-        ..default()
-    });
-    text_grid.add(cell.clone());
-}
-
-fn check_cells<'a>(
-    cells: &'a Query<(Entity, &Cell)>,
-    checking_cell: &Cell,
-    tried: &[&Cell],
-    grid: &Grid,
-    text_grid: &mut TextGrid,
-    mut commands: &mut Commands,
-    style: TextStyle,
-    color: Handle<ColorMaterial>,
-    trying: &mut Vec<(Entity, &'a Cell)>,
-) {
-    cells
-        .iter()
-        .filter(|(_, cell)| checking_cell.is_near(cell))
-        .filter(|(_, cell)| !tried.contains(cell))
-        .filter(|(entity, cell)| {
-            if grid.is_bomb_cell(cell) {
-                false
-            } else {
-                let bomb_cells = get_bombs(cells, cell, grid);
-                if bomb_cells > 0 && !text_grid.contains(cell) {
-                    change_cell_near_bomb(
-                        grid,
-                        text_grid,
-                        commands,
-                        bomb_cells,
-                        style.clone(),
-                        cell,
-                    );
-                    change_color(&mut commands, *entity, color.clone());
-                }
-                bomb_cells == 0
-            }
-        })
-        .for_each(|data| trying.push(data));
-}
-
-fn change_color(commands: &mut Commands, entity: Entity, color: Handle<ColorMaterial>) {
-    commands.entity(entity).insert(color);
 }
