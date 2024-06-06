@@ -1,5 +1,6 @@
 use crate::{Cell, Flag, Grid, TextGrid};
 use bevy::asset::Handle;
+use bevy::ecs::system::EntityCommands;
 use bevy::prelude::{
     default, ColorMaterial, Commands, Entity, Query, Text, Text2dBundle, TextSection, TextStyle,
     Transform, Without,
@@ -25,16 +26,29 @@ pub fn change_cell_near_bomb(
     style: TextStyle,
     cell: &Cell,
 ) {
-    let pos = grid.grid_to_global(cell);
+    spawn_text(
+        commands,
+        style,
+        bomb_cells.to_string(),
+        grid.grid_to_global(cell),
+    );
+    text_grid.add(cell.clone());
+}
+
+pub fn spawn_text<'a>(
+    commands: &'a mut Commands,
+    style: TextStyle,
+    text: impl Into<String>,
+    pos: (f32, f32),
+) -> EntityCommands<'a> {
     commands.spawn(Text2dBundle {
         text: Text {
-            sections: vec![TextSection::new(bomb_cells.to_string(), style)],
+            sections: vec![TextSection::new(text, style)],
             ..default()
         },
         transform: Transform::from_xyz(pos.0, pos.1, 1.0),
         ..default()
-    });
-    text_grid.add(cell.clone());
+    })
 }
 
 pub fn check_cells<'a>(

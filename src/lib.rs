@@ -1,6 +1,6 @@
 mod core;
 
-use crate::core::{change_cell_near_bomb, change_color, check_cells, get_bombs};
+use crate::core::{change_cell_near_bomb, change_color, check_cells, get_bombs, spawn_text};
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
@@ -8,8 +8,10 @@ use rand::distributions::Uniform;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
-#[derive(Component, Debug)]
-pub struct Flag {}
+#[derive(Component, Debug, Default)]
+pub struct Flag {
+    cell: Option<Cell>,
+}
 
 #[derive(Component, Eq, PartialEq, Debug, Clone)]
 pub struct Cell {
@@ -247,6 +249,55 @@ pub fn check_cell(
 
             change_color(&mut commands, checking_entity, color.clone());
             center_cell = trying.pop();
+        }
+    }
+}
+
+pub fn add_flag(
+    windows: Query<&Window>,
+    cameras: Query<(&Camera, &GlobalTransform)>,
+    cells: Query<(Entity, &Cell), Without<Flag>>,
+    grid: Res<Grid>,
+    mut commands: Commands,
+) {
+    let window = windows.single();
+    let (camera, transform) = cameras.single();
+    if let Some(world_position) = window
+        .cursor_position()
+        .and_then(|cursor| camera.viewport_to_world_2d(transform, cursor))
+    {
+        let clicked_cell = grid.global_to_grid(world_position.x, world_position.y);
+        if let Some((entity, cell)) = cells.iter().find(|(_, other)| &&clicked_cell == other) {
+            commands.entity(entity).insert(Flag::default());
+            spawn_text(
+                &mut commands,
+                TextStyle::default(),
+                "⚑",
+                grid.grid_to_global(cell),
+            )
+            .insert(Flag {
+                cell: Some(cell.clone()),
+            });
+        }
+    }
+}
+
+pub fn remove_flag(
+    windows: Query<&Window>,
+    cameras: Query<(&Camera, &GlobalTransform)>,
+    cells: Query<(Entity, &Cell), With<Flag>>,
+    grid: Res<Grid>,
+    mut commands: Commands,
+) {
+    let window = windows.single();
+    let (camera, transform) = cameras.single();
+    if let Some(world_position) = window
+        .cursor_position()
+        .and_then(|cursor| camera.viewport_to_world_2d(transform, cursor))
+    {
+        let clicked_cell = grid.global_to_grid(world_position.x, world_position.y);
+        if let Some((entity, _)) = cells.iter().find(|(_, other)| &&clicked_cell == other) {
+            commands.entity(entity).remove::<Flag>();
         }
     }
 }
