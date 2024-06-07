@@ -88,9 +88,11 @@ pub fn add_flag(
         let clicked_cell = grid.global_to_grid(world_position.x, world_position.y);
         if let Some((entity, cell)) = cells.iter().find(|(_, other)| &&clicked_cell == other) {
             commands.entity(entity).insert(Flag::default());
-            spawn_text(&mut commands, style, "🚩", grid.grid_to_global(cell)).insert(Flag {
-                cell: Some(cell.clone()),
-            });
+            spawn_text(&mut commands, style, "🚩", grid.grid_to_global(cell))
+                .insert(Flag {
+                    cell: Some(cell.clone()),
+                })
+                .insert(GameComponent);
         }
     }
 }
@@ -126,13 +128,13 @@ pub fn remove_flag(
 pub fn check_win(
     grid: Res<Grid>,
     cells: Query<&Cell>,
-    visibles: Query<&Visible>,
+    visible_cells: Query<&Visible>,
     flagged: Query<&Cell, With<Flag>>,
     mut app_state: ResMut<NextState<AppState>>,
     mut end_state: ResMut<NextState<EndState>>,
 ) {
     let bombs = grid.bombs();
-    if cells.iter().len() - bombs.len() == visibles.iter().len()
+    if cells.iter().len() - bombs.len() == visible_cells.iter().len()
         && flagged.iter().len() == bombs.len()
     {
         app_state.set(AppState::End);
@@ -157,7 +159,7 @@ pub fn grid_setup(
     let cell_width = width as f32 / grid_width as f32;
     let cell_height = height as f32 / grid_height as f32;
     let mut grid = Grid::new(grid_width, grid_height, width, height);
-    grid.generate(40);
+    grid.generate(1);
     commands.insert_resource(grid);
     commands.insert_resource(TextGrid::default());
     let mut camera = Camera2dBundle::default();
@@ -171,26 +173,30 @@ pub fn grid_setup(
     for x in 0..grid_width {
         for y in 0..grid_height {
             if x > 0 && y > 0 {
-                commands.spawn(MaterialMesh2dBundle {
-                    mesh: Mesh2dHandle(meshes.add(Rectangle::new(1.0, height as f32))),
-                    material: line_color.clone(),
-                    transform: Transform::from_xyz(
-                        x as f32 * cell_width,
-                        y as f32 * cell_height,
-                        1.0,
-                    ),
-                    ..default()
-                });
-                commands.spawn(MaterialMesh2dBundle {
-                    mesh: Mesh2dHandle(meshes.add(Rectangle::new(width as f32, 1.0))),
-                    material: line_color.clone(),
-                    transform: Transform::from_xyz(
-                        x as f32 * cell_width,
-                        y as f32 * cell_height,
-                        1.0,
-                    ),
-                    ..default()
-                });
+                commands
+                    .spawn(MaterialMesh2dBundle {
+                        mesh: Mesh2dHandle(meshes.add(Rectangle::new(1.0, height as f32))),
+                        material: line_color.clone(),
+                        transform: Transform::from_xyz(
+                            x as f32 * cell_width,
+                            y as f32 * cell_height,
+                            1.0,
+                        ),
+                        ..default()
+                    })
+                    .insert(GameComponent);
+                commands
+                    .spawn(MaterialMesh2dBundle {
+                        mesh: Mesh2dHandle(meshes.add(Rectangle::new(width as f32, 1.0))),
+                        material: line_color.clone(),
+                        transform: Transform::from_xyz(
+                            x as f32 * cell_width,
+                            y as f32 * cell_height,
+                            1.0,
+                        ),
+                        ..default()
+                    })
+                    .insert(GameComponent);
             }
             commands
                 .spawn(MaterialMesh2dBundle {
@@ -203,9 +209,14 @@ pub fn grid_setup(
                     ),
                     ..default()
                 })
-                .insert(Cell::new(x, y));
+                .insert(Cell::new(x, y))
+                .insert(GameComponent);
         }
     }
 }
 
-pub fn cleanup() {}
+pub fn cleanup(entities: Query<Entity, With<GameComponent>>, mut commands: Commands) {
+    entities
+        .iter()
+        .for_each(|entity| commands.entity(entity).despawn());
+}

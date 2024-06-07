@@ -1,5 +1,8 @@
 use bevy::prelude::*;
 
+#[derive(Component)]
+pub struct GameComponent;
+
 #[derive(Component, Debug, Default)]
 pub struct Flag {
     pub(crate) cell: Option<Cell>,

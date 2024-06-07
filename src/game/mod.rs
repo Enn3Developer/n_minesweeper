@@ -56,7 +56,8 @@ pub fn change_cell_near_bomb(
         style,
         bomb_cells.to_string(),
         grid.grid_to_global(cell),
-    );
+    )
+    .insert(GameComponent);
     text_grid.add(cell.clone());
 }
 
