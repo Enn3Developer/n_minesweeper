@@ -1,9 +1,13 @@
 use crate::game::components::*;
 use crate::game::resources::{ClearingCells, GameData};
 use crate::game::*;
-use crate::{AppState, EndState};
+use crate::{AppState, EndState, NStopWatch};
 use bevy::prelude::*;
 use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
+
+pub fn update_time(time: Res<Time>, mut stop_watch: ResMut<NStopWatch>) {
+    stop_watch.0.tick(time.delta());
+}
 
 pub fn clear_cells(
     mut clearing_cells: ResMut<ClearingCells>,
@@ -186,6 +190,7 @@ pub fn grid_setup(
     commands.insert_resource(game_data);
     commands.insert_resource(TextGrid::default());
     commands.insert_resource(ClearingCells::default());
+    commands.insert_resource(NStopWatch::default());
     let cell_color = materials.add(Color::rgb(1.0, 0.27, 0.0));
     let line_color = materials.add(Color::rgb(0.2, 0.2, 0.2));
     let cell_rectangle = meshes.add(Rectangle::new(cell_width, cell_height));

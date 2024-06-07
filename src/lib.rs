@@ -7,6 +7,7 @@ use crate::game::Game;
 use crate::menu::Menu;
 use bevy::app::PluginGroupBuilder;
 use bevy::prelude::*;
+use bevy::time::Stopwatch;
 
 pub struct NMines;
 
@@ -34,6 +35,9 @@ pub enum EndState {
     Win,
     Lose,
 }
+
+#[derive(Resource, Default)]
+pub struct NStopWatch(pub(crate) Stopwatch);
 
 #[macro_export]
 macro_rules! embedded_asset {
