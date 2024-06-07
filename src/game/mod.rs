@@ -80,22 +80,6 @@ pub fn spawn_text<'a>(
     })
 }
 
-pub fn check_cells<'a>(
-    cells: &'a Query<(Entity, &Cell, Option<&Flag>, Option<&Visible>)>,
-    checking_cell: &Cell,
-    tried: &[&Cell],
-    grid: &Grid,
-    trying: &mut Vec<(Entity, &'a Cell, Option<&'a Flag>, bool)>,
-) {
-    cells
-        .iter()
-        .filter(|(_, cell, _, _)| checking_cell.is_near(cell))
-        .filter(|(_, cell, _, _)| !tried.contains(cell))
-        .for_each(|(entity, cell, flag, _)| {
-            trying.push((entity, cell, flag, get_bombs(cells, cell, grid) == 0));
-        });
-}
-
 pub fn change_color(commands: &mut Commands, entity: Entity, color: Handle<ColorMaterial>) {
     commands.entity(entity).insert((color, Visible));
 }
