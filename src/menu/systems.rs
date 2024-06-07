@@ -12,6 +12,8 @@ const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.75, 0.35);
 pub fn init(mut windows: Query<&mut Window>) {
     let mut window = windows.single_mut();
     window.resolution.set(600.0, 600.0);
+    window.resize_constraints.min_height = 600.0;
+    window.resize_constraints.min_width = 600.0;
     window.title = String::from("N Mines");
 }
 
