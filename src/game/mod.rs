@@ -19,6 +19,7 @@ impl Plugin for Game {
                 Update,
                 (
                     check_win,
+                    clear_cells,
                     (
                         check_cell.run_if(input_just_pressed(MouseButton::Left)),
                         (add_flag, remove_flag)
@@ -34,14 +35,14 @@ impl Plugin for Game {
 }
 
 pub fn get_bombs(
-    cells: &Query<(Entity, &Cell, Option<&Flag>)>,
+    cells: &Query<(Entity, &Cell, Option<&Flag>, Option<&Visible>)>,
     checking_cell: &Cell,
     grid: &Grid,
 ) -> u32 {
     cells
         .iter()
-        .filter(|(_, cell, _)| checking_cell.is_near(cell))
-        .filter(|(_, cell, _)| grid.is_bomb_cell(cell))
+        .filter(|(_, cell, _, _)| checking_cell.is_near(cell))
+        .filter(|(_, cell, _, _)| grid.is_bomb_cell(cell))
         .count() as u32
 }
 
@@ -80,7 +81,7 @@ pub fn spawn_text<'a>(
 }
 
 pub fn check_cells<'a>(
-    cells: &'a Query<(Entity, &Cell, Option<&Flag>)>,
+    cells: &'a Query<(Entity, &Cell, Option<&Flag>, Option<&Visible>)>,
     checking_cell: &Cell,
     tried: &[&Cell],
     grid: &Grid,
@@ -88,9 +89,9 @@ pub fn check_cells<'a>(
 ) {
     cells
         .iter()
-        .filter(|(_, cell, _)| checking_cell.is_near(cell))
-        .filter(|(_, cell, _)| !tried.contains(cell))
-        .for_each(|(entity, cell, flag)| {
+        .filter(|(_, cell, _, _)| checking_cell.is_near(cell))
+        .filter(|(_, cell, _, _)| !tried.contains(cell))
+        .for_each(|(entity, cell, flag, _)| {
             trying.push((entity, cell, flag, get_bombs(cells, cell, grid) == 0));
         });
 }

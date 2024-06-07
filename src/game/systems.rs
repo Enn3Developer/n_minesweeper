@@ -1,26 +1,69 @@
 use crate::game::components::*;
+use crate::game::resources::{ClearingCells, GameData};
 use crate::game::*;
 use crate::{AppState, EndState};
 use bevy::prelude::*;
 use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
+
+pub fn clear_cells(
+    mut clearing_cells: ResMut<ClearingCells>,
+    mut text_grid: ResMut<TextGrid>,
+    mut commands: Commands,
+    cells: Query<(Entity, &Cell, Option<&Flag>, Option<&Visible>)>,
+    grid: Res<Grid>,
+    game_data: Res<GameData>,
+) {
+    let mut checking_cells = Vec::with_capacity(8);
+    while let Some(cell) = clearing_cells.cells.pop() {
+        checking_cells.push(cell);
+        if checking_cells.len() == 8 {
+            break;
+        }
+    }
+
+    for (entity, cell, flag) in checking_cells {
+        if grid.is_bomb_cell(&cell) || flag.is_some() {
+            continue;
+        }
+
+        let bomb_cells = get_bombs(&cells, &cell, &grid);
+        if bomb_cells > 0 {
+            if !text_grid.contains(&cell) {
+                change_cell_near_bomb(
+                    &grid,
+                    &mut text_grid,
+                    &mut commands,
+                    bomb_cells,
+                    game_data.normal_text(),
+                    &cell,
+                );
+            }
+        } else {
+            cells
+                .iter()
+                .filter(|(_, _, flag, visible)| flag.is_none() && visible.is_none())
+                .filter(|(_, c, _, _)| cell.is_near(c) && !grid.is_bomb_cell(c))
+                .for_each(|(entity, cell, flag, _)| {
+                    clearing_cells
+                        .cells
+                        .push((entity, cell.clone(), flag.map(|c| c.clone())))
+                });
+        }
+        change_color(&mut commands, entity, game_data.cell_color());
+    }
+}
 
 pub fn check_cell(
     windows: Query<&Window>,
     cells: Query<(Entity, &Cell, Option<&Flag>)>,
     cameras: Query<(&Camera, &GlobalTransform)>,
     grid: Res<Grid>,
-    mut text_grid: ResMut<TextGrid>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    mut commands: Commands,
+    mut clearing_cells: ResMut<ClearingCells>,
     mut app_state: ResMut<NextState<AppState>>,
     mut end_state: ResMut<NextState<EndState>>,
 ) {
     let window = windows.single();
     let (camera, transform) = cameras.single();
-    let mut style = TextStyle::default();
-    style.color = Color::BLACK;
-    style.font_size = 24.0;
-    let color = materials.add(Color::rgb(1.0, 1.0, 1.0));
     if let Some(world_position) = window
         .cursor_position()
         .and_then(|cursor| camera.viewport_to_world_2d(transform, cursor))
@@ -35,39 +78,14 @@ pub fn check_cell(
                 }
             },
         );
-        let mut center_cell = clicked.map(|(entity, cell, flag)| (entity, cell, flag, true));
-        let mut trying = vec![];
-        let mut tried = vec![];
-        while let Some((checking_entity, checking_cell, flag, check_others)) = center_cell {
-            tried.push(checking_cell);
-            let is_bomb = grid.is_bomb_cell(checking_cell);
-            if is_bomb || flag.is_some() {
-                center_cell = trying.pop();
-                if is_bomb && flag.is_none() {
-                    app_state.set(AppState::End);
-                    end_state.set(EndState::Lose);
-                }
-                continue;
+        let center_cell =
+            clicked.map(|(entity, cell, flag)| (entity, cell.clone(), flag.map(|c| c.clone())));
+        if let Some(data) = center_cell {
+            if grid.is_bomb_cell(&data.1) && data.2.is_none() {
+                app_state.set(AppState::End);
+                end_state.set(EndState::Lose);
             }
-
-            let bomb_cells = get_bombs(&cells, checking_cell, &grid);
-
-            if bomb_cells > 0 {
-                if !text_grid.contains(checking_cell) {
-                    change_cell_near_bomb(
-                        &grid,
-                        &mut text_grid,
-                        &mut commands,
-                        bomb_cells,
-                        style.clone(),
-                        checking_cell,
-                    );
-                }
-            } else if check_others {
-                check_cells(&cells, checking_cell, &tried, &grid, &mut trying);
-            }
-            change_color(&mut commands, checking_entity, color.clone());
-            center_cell = trying.pop();
+            clearing_cells.cells.push(data);
         }
     }
 }
@@ -77,15 +95,11 @@ pub fn add_flag(
     cameras: Query<(&Camera, &GlobalTransform)>,
     cells: Query<(Entity, &Cell), (Without<Flag>, Without<Visible>)>,
     grid: Res<Grid>,
+    game_data: Res<GameData>,
     mut commands: Commands,
-    server: Res<AssetServer>,
 ) {
     let window = windows.single();
     let (camera, transform) = cameras.single();
-    let mut style = TextStyle::default();
-    style.color = Color::BLACK;
-    style.font_size = 24.0;
-    style.font = server.load("embedded://n_minesweeper/fonts/NotoEmoji.ttf");
     if let Some(world_position) = window
         .cursor_position()
         .and_then(|cursor| camera.viewport_to_world_2d(transform, cursor))
@@ -93,11 +107,16 @@ pub fn add_flag(
         let clicked_cell = grid.global_to_grid(world_position.x, world_position.y);
         if let Some((entity, cell)) = cells.iter().find(|(_, other)| &&clicked_cell == other) {
             commands.entity(entity).insert(Flag::default());
-            spawn_text(&mut commands, style, "🚩", grid.grid_to_global(cell))
-                .insert(Flag {
-                    cell: Some(cell.clone()),
-                })
-                .insert(GameComponent);
+            spawn_text(
+                &mut commands,
+                game_data.flag_text(),
+                "🚩",
+                grid.grid_to_global(cell),
+            )
+            .insert(Flag {
+                cell: Some(cell.clone()),
+            })
+            .insert(GameComponent);
         }
     }
 }
@@ -151,6 +170,7 @@ pub fn grid_setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut commands: Commands,
     mut materials: ResMut<Assets<ColorMaterial>>,
+    server: Res<AssetServer>,
 ) {
     let width = 600;
     let height = width;
@@ -160,8 +180,12 @@ pub fn grid_setup(
     let cell_height = height as f32 / grid_height as f32;
     let mut grid = Grid::new(grid_width, grid_height, width, height);
     grid.generate(40);
+    let mut game_data = GameData::default();
+    game_data.setup(&mut materials, &server);
     commands.insert_resource(grid);
+    commands.insert_resource(game_data);
     commands.insert_resource(TextGrid::default());
+    commands.insert_resource(ClearingCells::default());
     let cell_color = materials.add(Color::rgb(1.0, 0.27, 0.0));
     let line_color = materials.add(Color::rgb(0.2, 0.2, 0.2));
     let cell_rectangle = meshes.add(Rectangle::new(cell_width, cell_height));
@@ -218,4 +242,6 @@ pub fn cleanup(entities: Query<Entity, With<GameComponent>>, mut commands: Comma
         .for_each(|entity| commands.entity(entity).despawn());
     commands.remove_resource::<Grid>();
     commands.remove_resource::<TextGrid>();
+    commands.remove_resource::<ClearingCells>();
+    commands.remove_resource::<GameData>();
 }

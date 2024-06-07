@@ -1,4 +1,4 @@
-use crate::game::components::Cell;
+use crate::game::components::{Cell, Flag};
 use bevy::prelude::*;
 use rand::distributions::Uniform;
 use rand::prelude::StdRng;
@@ -81,5 +81,43 @@ impl TextGrid {
 
     pub fn contains(&self, cell: &Cell) -> bool {
         self.texts.contains(cell)
+    }
+}
+
+#[derive(Resource, Default)]
+pub struct ClearingCells {
+    pub(crate) cells: Vec<(Entity, Cell, Option<Flag>)>,
+}
+
+#[derive(Resource, Default)]
+pub struct GameData {
+    colors: Vec<Handle<ColorMaterial>>,
+    text_styles: Vec<TextStyle>,
+}
+
+impl GameData {
+    pub fn setup(&mut self, materials: &mut Assets<ColorMaterial>, server: &AssetServer) {
+        self.colors.push(materials.add(Color::rgb(1.0, 1.0, 1.0)));
+        let mut style = TextStyle::default();
+        style.color = Color::BLACK;
+        style.font_size = 24.0;
+        self.text_styles.push(style);
+        let mut style = TextStyle::default();
+        style.color = Color::BLACK;
+        style.font_size = 24.0;
+        style.font = server.load("embedded://n_minesweeper/fonts/NotoEmoji.ttf");
+        self.text_styles.push(style);
+    }
+
+    pub fn cell_color(&self) -> Handle<ColorMaterial> {
+        self.colors[0].clone()
+    }
+
+    pub fn normal_text(&self) -> TextStyle {
+        self.text_styles[0].clone()
+    }
+
+    pub fn flag_text(&self) -> TextStyle {
+        self.text_styles[1].clone()
     }
 }
