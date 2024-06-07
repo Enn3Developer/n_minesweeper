@@ -12,17 +12,13 @@ const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.75, 0.35);
 pub fn init(mut windows: Query<&mut Window>) {
     let mut window = windows.single_mut();
     window.resolution.set(600.0, 600.0);
-    window.resizable = false;
     window.title = String::from("N Mines");
 }
 
 pub fn setup(mut commands: Commands) {
     let mut camera = Camera2dBundle::default();
     camera.transform.translation = Vec3::new(600.0 / 2.0, 600.0 / 2.0, 0.0);
-    camera.projection.scaling_mode = ScalingMode::Fixed {
-        width: 600.0,
-        height: 600.0,
-    };
+    camera.projection.scaling_mode = ScalingMode::WindowSize(1.0);
     commands.spawn(camera);
 
     let button_style = Style {

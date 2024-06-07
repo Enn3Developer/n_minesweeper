@@ -164,29 +164,21 @@ pub fn grid_setup(
     commands.insert_resource(TextGrid::default());
     let line_color = materials.add(Color::rgb(0.2, 0.2, 0.2));
     for x in 0..grid_width {
+        commands
+            .spawn(MaterialMesh2dBundle {
+                mesh: Mesh2dHandle(meshes.add(Rectangle::new(1.0, height as f32))),
+                material: line_color.clone(),
+                transform: Transform::from_xyz(x as f32 * cell_width, 300.0, 1.0),
+                ..default()
+            })
+            .insert(GameComponent);
         for y in 0..grid_height {
             if x > 0 && y > 0 {
                 commands
                     .spawn(MaterialMesh2dBundle {
-                        mesh: Mesh2dHandle(meshes.add(Rectangle::new(1.0, height as f32))),
-                        material: line_color.clone(),
-                        transform: Transform::from_xyz(
-                            x as f32 * cell_width,
-                            y as f32 * cell_height,
-                            1.0,
-                        ),
-                        ..default()
-                    })
-                    .insert(GameComponent);
-                commands
-                    .spawn(MaterialMesh2dBundle {
                         mesh: Mesh2dHandle(meshes.add(Rectangle::new(width as f32, 1.0))),
                         material: line_color.clone(),
-                        transform: Transform::from_xyz(
-                            x as f32 * cell_width,
-                            y as f32 * cell_height,
-                            1.0,
-                        ),
+                        transform: Transform::from_xyz(300.0, y as f32 * cell_height, 1.0),
                         ..default()
                     })
                     .insert(GameComponent);
