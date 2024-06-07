@@ -1,6 +1,5 @@
 use crate::game::components::{Cell, Flag};
 use bevy::prelude::*;
-use bevy::time::Stopwatch;
 use rand::distributions::Uniform;
 use rand::prelude::StdRng;
 use rand::{Rng, SeedableRng};
