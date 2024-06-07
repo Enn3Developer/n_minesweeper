@@ -65,7 +65,7 @@ pub fn setup(mut commands: Commands) {
                 .with_children(|parent| {
                     parent.spawn(
                         TextBundle::from_section(
-                            format!("N Mines v{}", env!("CARGO_PKG_VERSION")),
+                            "N Mines",
                             TextStyle {
                                 font_size: 40.0,
                                 color: text_color,
@@ -73,7 +73,32 @@ pub fn setup(mut commands: Commands) {
                             },
                         )
                         .with_style(Style {
-                            margin: UiRect::all(Val::Px(50.0)),
+                            margin: UiRect::new(
+                                Val::Px(50.0),
+                                Val::Px(50.0),
+                                Val::Px(50.0),
+                                Val::Px(10.0),
+                            ),
+                            ..default()
+                        }),
+                    );
+                    parent.spawn(
+                        TextBundle::from_section(
+                            format!("v{}", env!("CARGO_PKG_VERSION")),
+                            TextStyle {
+                                font_size: 24.0,
+                                color: text_color,
+                                ..default()
+                            },
+                        )
+                        .with_style(Style {
+                            margin: UiRect::new(
+                                Val::Px(10.0),
+                                Val::Px(10.0),
+                                Val::Px(0.0),
+                                Val::Px(50.0),
+                            ),
+                            align_self: AlignSelf::End,
                             ..default()
                         }),
                     );
