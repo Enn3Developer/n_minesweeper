@@ -162,42 +162,54 @@ pub fn grid_setup(
     grid.generate(40);
     commands.insert_resource(grid);
     commands.insert_resource(TextGrid::default());
+    let cell_color = materials.add(Color::rgb(1.0, 0.27, 0.0));
     let line_color = materials.add(Color::rgb(0.2, 0.2, 0.2));
+    let cell_rectangle = meshes.add(Rectangle::new(cell_width, cell_height));
+    let vertical_line = meshes.add(Rectangle::new(1.0, height as f32));
+    let horizontal_line = meshes.add(Rectangle::new(width as f32, 1.0));
+    let mut line_meshes = Vec::with_capacity((grid_width + grid_height) as usize);
+    let mut cell_meshes = Vec::with_capacity((grid_width * grid_height) as usize);
     for x in 0..grid_width {
-        commands
-            .spawn(MaterialMesh2dBundle {
-                mesh: Mesh2dHandle(meshes.add(Rectangle::new(1.0, height as f32))),
-                material: line_color.clone(),
-                transform: Transform::from_xyz(x as f32 * cell_width, 300.0, 1.0),
-                ..default()
-            })
-            .insert(GameComponent);
+        if x > 0 {
+            line_meshes.push((
+                MaterialMesh2dBundle {
+                    mesh: Mesh2dHandle(vertical_line.clone()),
+                    material: line_color.clone(),
+                    transform: Transform::from_xyz(x as f32 * cell_width, 300.0, 1.0),
+                    ..default()
+                },
+                GameComponent,
+            ));
+            line_meshes.push((
+                MaterialMesh2dBundle {
+                    mesh: Mesh2dHandle(horizontal_line.clone()),
+                    material: line_color.clone(),
+                    transform: Transform::from_xyz(300.0, x as f32 * cell_height, 1.0),
+                    ..default()
+                },
+                GameComponent,
+            ));
+        }
         for y in 0..grid_height {
-            if x > 0 && y > 0 {
-                commands
-                    .spawn(MaterialMesh2dBundle {
-                        mesh: Mesh2dHandle(meshes.add(Rectangle::new(width as f32, 1.0))),
-                        material: line_color.clone(),
-                        transform: Transform::from_xyz(300.0, y as f32 * cell_height, 1.0),
-                        ..default()
-                    })
-                    .insert(GameComponent);
-            }
-            commands
-                .spawn(MaterialMesh2dBundle {
-                    mesh: Mesh2dHandle(meshes.add(Rectangle::new(cell_width, cell_height))),
-                    material: materials.add(Color::rgb(1.0, 0.27, 0.0)),
+            cell_meshes.push((
+                MaterialMesh2dBundle {
+                    mesh: Mesh2dHandle(cell_rectangle.clone()),
+                    material: cell_color.clone(),
                     transform: Transform::from_xyz(
                         (x as f32 + 0.5) * cell_width,
                         (y as f32 + 0.5) * cell_height,
                         0.0,
                     ),
                     ..default()
-                })
-                .insert(Cell::new(x, y))
-                .insert(GameComponent);
+                },
+                GameComponent,
+                Cell::new(x, y),
+            ));
         }
     }
+
+    commands.spawn_batch(line_meshes);
+    commands.spawn_batch(cell_meshes);
 }
 
 pub fn cleanup(entities: Query<Entity, With<GameComponent>>, mut commands: Commands) {

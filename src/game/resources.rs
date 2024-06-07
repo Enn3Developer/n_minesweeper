@@ -16,7 +16,7 @@ pub struct Grid {
 impl Grid {
     pub fn new(grid_width: u32, grid_height: u32, width: u32, height: u32) -> Self {
         Grid {
-            bombs: vec![],
+            bombs: Vec::with_capacity(64),
             grid_width,
             grid_height,
             width,
