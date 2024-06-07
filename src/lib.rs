@@ -1,5 +1,3 @@
-#![feature(trivial_bounds)]
-
 pub mod end;
 pub mod game;
 pub mod menu;

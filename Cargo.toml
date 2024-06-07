@@ -5,7 +5,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bevy = { version = "0.13.1", features = ["dynamic_linking", "wayland"] }
+bevy = { version = "0.13.1", features = ["wayland"] }
 rand = "0.8.5"
 
 [profile.dev]
@@ -17,4 +17,3 @@ opt-level = "z"
 strip = true
 lto = true
 codegen-units = 1
-panic = "abort"
