@@ -1,5 +1,7 @@
+pub mod end;
 pub mod game;
 
+use crate::end::End;
 use crate::game::Game;
 use bevy::app::PluginGroupBuilder;
 use bevy::prelude::*;
@@ -8,7 +10,7 @@ pub struct NMines;
 
 impl PluginGroup for NMines {
     fn build(self) -> PluginGroupBuilder {
-        PluginGroupBuilder::start::<Self>().add(Game)
+        PluginGroupBuilder::start::<Self>().add(Game).add(End)
     }
 }
 

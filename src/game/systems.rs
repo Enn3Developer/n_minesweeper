@@ -13,6 +13,8 @@ pub fn check_cell(
     mut text_grid: ResMut<TextGrid>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut commands: Commands,
+    mut app_state: ResMut<NextState<AppState>>,
+    mut end_state: ResMut<NextState<EndState>>,
 ) {
     let window = windows.single();
     let (camera, transform) = cameras.single();
@@ -39,9 +41,13 @@ pub fn check_cell(
         let mut tried = vec![];
         while let Some((checking_entity, checking_cell, flag, check_others)) = center_cell {
             tried.push(checking_cell);
-            if grid.is_bomb_cell(checking_cell) || flag.is_some() {
-                println!("bomb or flag");
+            let is_bomb = grid.is_bomb_cell(checking_cell);
+            if is_bomb || flag.is_some() {
                 center_cell = trying.pop();
+                if is_bomb && flag.is_none() {
+                    app_state.set(AppState::End);
+                    end_state.set(EndState::Lose);
+                }
                 continue;
             }
 
@@ -159,7 +165,7 @@ pub fn grid_setup(
     let cell_width = width as f32 / grid_width as f32;
     let cell_height = height as f32 / grid_height as f32;
     let mut grid = Grid::new(grid_width, grid_height, width, height);
-    grid.generate(1);
+    grid.generate(40);
     commands.insert_resource(grid);
     commands.insert_resource(TextGrid::default());
     let mut camera = Camera2dBundle::default();
