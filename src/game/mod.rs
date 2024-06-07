@@ -21,7 +21,9 @@ impl Plugin for Game {
                     check_win,
                     (
                         check_cell.run_if(input_just_pressed(MouseButton::Left)),
-                        (add_flag, remove_flag).run_if(input_just_pressed(MouseButton::Right)),
+                        (add_flag, remove_flag)
+                            .run_if(input_just_pressed(MouseButton::Right))
+                            .before(check_cell),
                     )
                         .before(check_win),
                 )
