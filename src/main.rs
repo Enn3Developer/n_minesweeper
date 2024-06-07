@@ -5,7 +5,7 @@ fn main() {
     let mut app = App::new();
     app.add_plugins(DefaultPlugins)
         .add_plugins(NMines)
-        .insert_state(AppState::Playing)
+        .init_state::<AppState>()
         .init_state::<EndState>();
     app.run();
 }

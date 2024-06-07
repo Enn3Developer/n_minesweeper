@@ -22,3 +22,9 @@ pub fn show_text(mut commands: Commands, end_state: Res<State<EndState>>) {
         ..default()
     });
 }
+
+pub fn cleanup(texts: Query<Entity, With<Text>>, mut commands: Commands) {
+    texts
+        .iter()
+        .for_each(|text| commands.entity(text).despawn());
+}

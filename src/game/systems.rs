@@ -2,7 +2,6 @@ use crate::game::components::*;
 use crate::game::*;
 use crate::{AppState, EndState};
 use bevy::prelude::*;
-use bevy::render::camera::ScalingMode;
 use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
 
 pub fn check_cell(
@@ -152,14 +151,9 @@ pub fn grid_setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut commands: Commands,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    mut windows: Query<&mut Window>,
 ) {
-    let mut window = windows.single_mut();
     let width = 600;
     let height = width;
-    window.resolution.set(width as f32, height as f32);
-    window.resizable = false;
-    window.title = String::from("N Mines");
     let grid_width = 20;
     let grid_height = 20;
     let cell_width = width as f32 / grid_width as f32;
@@ -168,14 +162,7 @@ pub fn grid_setup(
     grid.generate(40);
     commands.insert_resource(grid);
     commands.insert_resource(TextGrid::default());
-    let mut camera = Camera2dBundle::default();
-    camera.transform.translation = Vec3::new(width as f32 / 2.0, height as f32 / 2.0, 0.0);
-    camera.projection.scaling_mode = ScalingMode::Fixed {
-        width: width as f32,
-        height: height as f32,
-    };
     let line_color = materials.add(Color::rgb(0.2, 0.2, 0.2));
-    commands.spawn(camera);
     for x in 0..grid_width {
         for y in 0..grid_height {
             if x > 0 && y > 0 {
@@ -225,4 +212,6 @@ pub fn cleanup(entities: Query<Entity, With<GameComponent>>, mut commands: Comma
     entities
         .iter()
         .for_each(|entity| commands.entity(entity).despawn());
+    commands.remove_resource::<Grid>();
+    commands.remove_resource::<TextGrid>();
 }
