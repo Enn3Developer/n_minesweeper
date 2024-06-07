@@ -65,7 +65,7 @@ pub fn setup(mut commands: Commands) {
                 .with_children(|parent| {
                     parent.spawn(
                         TextBundle::from_section(
-                            "N Mines",
+                            format!("N Mines v{}", env!("CARGO_PKG_VERSION")),
                             TextStyle {
                                 font_size: 40.0,
                                 color: text_color,
