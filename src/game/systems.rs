@@ -85,7 +85,7 @@ pub fn add_flag(
     let mut style = TextStyle::default();
     style.color = Color::BLACK;
     style.font_size = 24.0;
-    style.font = server.load("fonts/NotoEmoji.ttf");
+    style.font = server.load("embedded://n_minesweeper/fonts/NotoEmoji.ttf");
     if let Some(world_position) = window
         .cursor_position()
         .and_then(|cursor| camera.viewport_to_world_2d(transform, cursor))
