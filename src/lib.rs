@@ -3,6 +3,7 @@ mod core;
 use crate::core::{change_cell_near_bomb, change_color, check_cells, get_bombs, spawn_text};
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
+use bevy::render::render_resource::encase::private::RuntimeSizedArray;
 use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
 use rand::distributions::Uniform;
 use rand::rngs::StdRng;
@@ -298,5 +299,19 @@ pub fn remove_flag(
                 commands.entity(text).despawn();
             }
         }
+    }
+}
+
+pub fn check_win(
+    grid: Res<Grid>,
+    cells: Query<&Cell>,
+    visibles: Query<&Visible>,
+    flagged: Query<&Cell, With<Flag>>,
+) {
+    let bombs = grid.bombs();
+    if cells.iter().len() - bombs.len() == visibles.iter().len()
+        && flagged.iter().len() == bombs.len()
+    {
+        println!("win");
     }
 }

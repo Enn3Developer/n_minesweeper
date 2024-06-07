@@ -1,3 +1,4 @@
+cargo-features = ["codegen-backend"]
 [package]
 name = "n_minesweeper"
 version = "0.1.0"
@@ -8,7 +9,12 @@ bevy = { version = "0.13.1", features = ["dynamic_linking", "wayland"] }
 rand = "0.8.5"
 
 [profile.dev]
-opt-level = 1
+debug = 0
+codegen-backend = "cranelift"
 
-[profile.dev.package."*"]
-opt-level = 1
+[profile.release]
+opt-level = "z"
+strip = true
+lto = true
+codegen-units = 1
+panic = "abort"
