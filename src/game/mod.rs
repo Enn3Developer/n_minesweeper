@@ -1,10 +1,35 @@
-use crate::{Cell, Flag, Grid, TextGrid, Visible};
-use bevy::asset::Handle;
+pub mod components;
+pub mod resources;
+pub mod systems;
+
+use crate::game::components::*;
+use crate::game::resources::{Grid, TextGrid};
+use crate::AppState;
 use bevy::ecs::system::EntityCommands;
-use bevy::prelude::{
-    default, ColorMaterial, Commands, Entity, Query, Text, Text2dBundle, TextSection, TextStyle,
-    Transform,
-};
+use bevy::input::common_conditions::input_just_pressed;
+use bevy::prelude::*;
+use systems::*;
+
+pub struct Game;
+
+impl Plugin for Game {
+    fn build(&self, app: &mut App) {
+        app.add_systems(OnEnter(AppState::Playing), grid_setup)
+            .add_systems(
+                Update,
+                (
+                    check_win,
+                    (
+                        check_cell.run_if(input_just_pressed(MouseButton::Left)),
+                        (add_flag, remove_flag).run_if(input_just_pressed(MouseButton::Right)),
+                    )
+                        .before(check_win),
+                )
+                    .run_if(in_state(AppState::Playing)),
+            )
+            .add_systems(OnExit(AppState::Playing), cleanup);
+    }
+}
 
 pub fn get_bombs(
     cells: &Query<(Entity, &Cell, Option<&Flag>)>,
