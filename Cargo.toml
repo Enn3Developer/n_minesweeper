@@ -5,7 +5,17 @@ version = "0.4.0"
 edition = "2021"
 
 [dependencies]
-bevy = { version = "0.13.1", features = ["wayland"] }
+bevy = { version = "0.13.2", default-features = false, features = [
+    "wayland",
+    "x11",
+    "bevy_winit",
+    "bevy_asset",
+    "bevy_text",
+    "bevy_ui",
+    "bevy_render",
+    "bevy_sprite",
+    "default_font"
+] }
 rand = "0.8.5"
 
 [profile.dev]
