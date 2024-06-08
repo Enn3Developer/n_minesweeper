@@ -1,4 +1,3 @@
-pub mod components;
 pub mod systems;
 
 use crate::menu::systems::*;
