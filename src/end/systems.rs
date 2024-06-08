@@ -1,11 +1,14 @@
 use crate::{AppState, EndState, NStopWatch};
 use bevy::prelude::*;
-use bevy::sprite::Anchor;
+use bevy_egui::egui::FontFamily::Proportional;
+use bevy_egui::egui::TextStyle::{Body, Heading, Monospace, Small};
+use bevy_egui::egui::{emath, FontId};
+use bevy_egui::{egui, EguiContexts};
 
-pub fn show_text(
-    mut commands: Commands,
+pub fn show_results(
     end_state: Res<State<EndState>>,
     stop_watch: Res<NStopWatch>,
+    mut ctx: EguiContexts,
 ) {
     let text = match end_state.get() {
         EndState::NotEnded => unreachable!(),
@@ -13,41 +16,25 @@ pub fn show_text(
         EndState::Lose => "You lose!",
     };
 
-    commands.spawn(Text2dBundle {
-        text: Text::from_section(
-            text,
-            TextStyle {
-                font_size: 32.0,
-                ..default()
-            },
-        ),
-        transform: Transform::from_xyz(300.0, 350.0, 0.0),
-        text_anchor: Anchor::Center,
-        ..default()
+    let ctx = ctx.ctx_mut();
+    ctx.style_mut(|style| {
+        style.text_styles = [
+            (Heading, FontId::new(32.0, Proportional)),
+            (Body, FontId::new(26.0, Proportional)),
+            (Monospace, FontId::new(14.0, Proportional)),
+            (egui::TextStyle::Button, FontId::new(22.0, Proportional)),
+            (Small, FontId::new(10.0, Proportional)),
+        ]
+        .into();
     });
-    commands.spawn(Text2dBundle {
-        text: Text::from_section(
-            format!("{:0.2} seconds", stop_watch.0.elapsed_secs()),
-            TextStyle {
-                font_size: 32.0,
-                ..default()
-            },
-        ),
-        transform: Transform::from_xyz(300.0, 300.0, 0.0),
-        text_anchor: Anchor::Center,
-        ..default()
-    });
-    commands.spawn(Text2dBundle {
-        text: Text::from_section(
-            "Click to return to the main menu",
-            TextStyle {
-                font_size: 26.0,
-                ..default()
-            },
-        ),
-        transform: Transform::from_xyz(300.0, 250.0, 0.0),
-        text_anchor: Anchor::Center,
-        ..default()
+
+    egui::CentralPanel::default().show(ctx, |ui| {
+        ui.vertical_centered(|ui| {
+            ui.allocate_space(emath::Vec2::new(1.0, 100.0));
+            ui.heading(text);
+            ui.heading(format!("{:0.2} seconds", stop_watch.0.elapsed_secs()));
+            ui.label("Click to return to the main menu");
+        });
     });
 }
 
