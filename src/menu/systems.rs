@@ -1,4 +1,4 @@
-use crate::AppState;
+use crate::{AppState, GameSettings};
 use bevy::app::AppExit;
 use bevy::prelude::*;
 use bevy_egui::egui::FontFamily::Proportional;
@@ -19,6 +19,7 @@ pub fn draw_ui(
     mut ctx: EguiContexts,
     mut app_exit_events: EventWriter<AppExit>,
     mut app_state: ResMut<NextState<AppState>>,
+    mut commands: Commands,
 ) {
     let ctx = ctx.ctx_mut();
     ctx.style_mut(|style| {
@@ -47,6 +48,11 @@ pub fn draw_ui(
                 ui.allocate_space(emath::Vec2::new(1.0, 100.0));
                 if ui.button("Play").clicked() {
                     app_state.set(AppState::Playing);
+                    commands.insert_resource(GameSettings {
+                        width: 20,
+                        height: 20,
+                        bombs: 40,
+                    });
                 }
                 if ui.button("Exit").clicked() {
                     app_exit_events.send(AppExit);

@@ -1,7 +1,7 @@
 use crate::game::components::*;
 use crate::game::resources::{ClearingCells, GameData, NTimer};
 use crate::game::*;
-use crate::{AppState, EndState, NStopWatch};
+use crate::{AppState, EndState, GameSettings, NStopWatch};
 use bevy::prelude::*;
 use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
 
@@ -191,15 +191,16 @@ pub fn grid_setup(
     mut commands: Commands,
     mut materials: ResMut<Assets<ColorMaterial>>,
     server: Res<AssetServer>,
+    game_settings: Res<GameSettings>,
 ) {
     let width = 600;
     let height = width;
-    let grid_width = 20;
-    let grid_height = 20;
+    let grid_width = game_settings.width;
+    let grid_height = game_settings.height;
     let cell_width = width as f32 / grid_width as f32;
     let cell_height = height as f32 / grid_height as f32;
     let mut grid = Grid::new(grid_width, grid_height, width, height);
-    grid.generate(40);
+    grid.generate(game_settings.bombs);
     let mut game_data = GameData::default();
     game_data.setup(&mut materials, &server);
     commands.insert_resource(grid);
@@ -266,4 +267,5 @@ pub fn cleanup(entities: Query<Entity, With<GameComponent>>, mut commands: Comma
     commands.remove_resource::<ClearingCells>();
     commands.remove_resource::<GameData>();
     commands.remove_resource::<NTimer>();
+    commands.remove_resource::<GameSettings>();
 }

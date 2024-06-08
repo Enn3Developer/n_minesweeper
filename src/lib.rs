@@ -64,6 +64,13 @@ pub enum EndState {
 #[derive(Resource, Default)]
 pub struct NStopWatch(pub(crate) Stopwatch);
 
+#[derive(Resource)]
+pub struct GameSettings {
+    pub width: u32,
+    pub height: u32,
+    pub bombs: u32,
+}
+
 #[macro_export]
 macro_rules! embedded_asset {
     ($app: ident, $path: expr) => {{
