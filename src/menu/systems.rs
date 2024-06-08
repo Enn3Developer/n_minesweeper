@@ -4,7 +4,7 @@ use bevy::app::AppExit;
 use bevy::prelude::*;
 use bevy_egui::egui::FontFamily::Proportional;
 use bevy_egui::egui::TextStyle::{Body, Heading, Monospace, Small};
-use bevy_egui::egui::{FontId};
+use bevy_egui::egui::{emath, FontId, Widget};
 use bevy_egui::{egui, EguiContexts};
 
 pub fn despawn_ui<T: Component>(
@@ -20,9 +20,9 @@ pub fn draw_ui(
     mut ctx: EguiContexts,
     mut app_exit_events: EventWriter<AppExit>,
     mut app_state: ResMut<NextState<AppState>>,
-    mut commands: Commands,
     current_state: Res<State<MenuState>>,
     mut next_state: ResMut<NextState<MenuState>>,
+    mut game_settings: ResMut<GameSettings>,
 ) {
     let ctx = ctx.ctx_mut();
     ctx.style_mut(|style| {
@@ -49,24 +49,26 @@ pub fn draw_ui(
     match current_state.get() {
         MenuState::None => {
             egui::CentralPanel::default().show(ctx, |ui| {
-                control_buttons(
-                    ui,
-                    &mut app_state,
-                    &mut commands,
-                    &mut next_state,
-                    &mut app_exit_events,
-                );
+                control_buttons(ui, &mut app_state, &mut next_state, &mut app_exit_events);
             });
         }
         MenuState::Customizing => {
             egui::SidePanel::left("left").show(ctx, |ui| {
-                control_buttons(
-                    ui,
-                    &mut app_state,
-                    &mut commands,
-                    &mut next_state,
-                    &mut app_exit_events,
-                );
+                control_buttons(ui, &mut app_state, &mut next_state, &mut app_exit_events);
+            });
+            egui::CentralPanel::default().show(ctx, |ui| {
+                ui.vertical_centered(|ui| {
+                    ui.allocate_space(emath::Vec2::new(1.0, 100.0));
+                    egui::Slider::new(&mut game_settings.width, 1..=100)
+                        .text("Width")
+                        .ui(ui);
+                    egui::Slider::new(&mut game_settings.height, 1..=100)
+                        .text("Height")
+                        .ui(ui);
+                    egui::Slider::new(&mut game_settings.bombs, 1..=100)
+                        .text("Bombs")
+                        .ui(ui);
+                });
             });
         }
     }

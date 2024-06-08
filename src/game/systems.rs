@@ -267,5 +267,4 @@ pub fn cleanup(entities: Query<Entity, With<GameComponent>>, mut commands: Comma
     commands.remove_resource::<ClearingCells>();
     commands.remove_resource::<GameData>();
     commands.remove_resource::<NTimer>();
-    commands.remove_resource::<GameSettings>();
 }

@@ -12,6 +12,7 @@ pub struct Menu;
 impl Plugin for Menu {
     fn build(&self, app: &mut App) {
         app.add_plugins(EguiPlugin)
+            .insert_resource(GameSettings::default())
             .init_state::<MenuState>()
             .add_systems(OnExit(AppState::MainMenu), cleanup)
             .add_systems(Update, draw_ui.run_if(in_state(AppState::MainMenu)));
@@ -28,7 +29,6 @@ pub enum MenuState {
 pub fn control_buttons(
     ui: &mut Ui,
     app_state: &mut NextState<AppState>,
-    commands: &mut Commands,
     next_state: &mut NextState<MenuState>,
     app_exit_events: &mut EventWriter<AppExit>,
 ) {
@@ -36,11 +36,7 @@ pub fn control_buttons(
         ui.allocate_space(emath::Vec2::new(1.0, 100.0));
         if ui.button("Play").clicked() {
             app_state.set(AppState::Playing);
-            commands.insert_resource(GameSettings {
-                width: 20,
-                height: 20,
-                bombs: 40,
-            });
+            next_state.set(MenuState::None);
         }
         if ui.button("Customize").clicked() {
             next_state.set(MenuState::Customizing);

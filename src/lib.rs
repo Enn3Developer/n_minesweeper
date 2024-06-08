@@ -71,6 +71,16 @@ pub struct GameSettings {
     pub bombs: u32,
 }
 
+impl Default for GameSettings {
+    fn default() -> Self {
+        GameSettings {
+            width: 20,
+            height: 20,
+            bombs: 40,
+        }
+    }
+}
+
 #[macro_export]
 macro_rules! embedded_asset {
     ($app: ident, $path: expr) => {{

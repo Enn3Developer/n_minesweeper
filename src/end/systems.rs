@@ -1,4 +1,4 @@
-use crate::{AppState, EndState, NStopWatch};
+use crate::{AppState, EndState, GameSettings, NStopWatch};
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
 
