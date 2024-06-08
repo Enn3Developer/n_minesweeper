@@ -104,7 +104,7 @@ impl GameData {
         style.font_size = 24.0;
         self.text_styles.push(style);
         let mut style = TextStyle::default();
-        style.color = Color::BLACK;
+        style.color = Color::CYAN;
         style.font_size = 24.0;
         style.font = server.load("embedded://n_minesweeper/fonts/NotoEmoji.ttf");
         self.text_styles.push(style);
