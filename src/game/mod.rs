@@ -4,7 +4,7 @@ pub mod systems;
 
 use crate::game::components::*;
 use crate::game::resources::{Grid, TextGrid};
-use crate::AppState;
+use crate::{AppState, EndState};
 use bevy::ecs::system::EntityCommands;
 use bevy::input::common_conditions::input_just_pressed;
 use bevy::prelude::*;
@@ -29,9 +29,11 @@ impl Plugin for Game {
                             .before(clear_cells),
                     )
                         .before(check_win),
+                    tick_timer.run_if(not(in_state(EndState::NotEnded))),
                 )
                     .run_if(in_state(AppState::Playing)),
             )
+            .add_systems(OnExit(EndState::NotEnded), show_bombs)
             .add_systems(OnExit(AppState::Playing), cleanup);
     }
 }

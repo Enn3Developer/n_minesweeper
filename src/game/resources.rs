@@ -98,6 +98,7 @@ pub struct GameData {
 impl GameData {
     pub fn setup(&mut self, materials: &mut Assets<ColorMaterial>, server: &AssetServer) {
         self.colors.push(materials.add(Color::rgb(1.0, 1.0, 1.0)));
+        self.colors.push(materials.add(Color::rgb(0.0, 0.0, 0.0)));
         let mut style = TextStyle::default();
         style.color = Color::BLACK;
         style.font_size = 24.0;
@@ -112,6 +113,9 @@ impl GameData {
     pub fn cell_color(&self) -> Handle<ColorMaterial> {
         self.colors[0].clone()
     }
+    pub fn bomb_color(&self) -> Handle<ColorMaterial> {
+        self.colors[1].clone()
+    }
 
     pub fn normal_text(&self) -> TextStyle {
         self.text_styles[0].clone()
@@ -121,3 +125,6 @@ impl GameData {
         self.text_styles[1].clone()
     }
 }
+
+#[derive(Resource)]
+pub struct NTimer(pub(crate) Timer);

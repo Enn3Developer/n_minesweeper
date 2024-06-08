@@ -1,5 +1,5 @@
 use crate::game::components::*;
-use crate::game::resources::{ClearingCells, GameData};
+use crate::game::resources::{ClearingCells, GameData, NTimer};
 use crate::game::*;
 use crate::{AppState, EndState, NStopWatch};
 use bevy::prelude::*;
@@ -7,6 +7,30 @@ use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
 
 pub fn update_time(time: Res<Time>, mut stop_watch: ResMut<NStopWatch>) {
     stop_watch.0.tick(time.delta());
+}
+
+pub fn tick_timer(
+    mut timer: ResMut<NTimer>,
+    time: Res<Time>,
+    mut app_state: ResMut<NextState<AppState>>,
+) {
+    if timer.0.tick(time.delta()).finished() {
+        app_state.set(AppState::End);
+    }
+}
+
+pub fn show_bombs(
+    mut commands: Commands,
+    grid: Res<Grid>,
+    cells: Query<(Entity, &Cell)>,
+    game_data: Res<GameData>,
+) {
+    commands.insert_resource(NTimer(Timer::from_seconds(2.0, TimerMode::Once)));
+    cells.iter().for_each(|(entity, cell)| {
+        if grid.is_bomb_cell(cell) {
+            change_color(&mut commands, entity, game_data.bomb_color());
+        }
+    });
 }
 
 pub fn clear_cells(
@@ -63,7 +87,6 @@ pub fn check_cell(
     cameras: Query<(&Camera, &GlobalTransform)>,
     grid: Res<Grid>,
     mut clearing_cells: ResMut<ClearingCells>,
-    mut app_state: ResMut<NextState<AppState>>,
     mut end_state: ResMut<NextState<EndState>>,
 ) {
     let window = windows.single();
@@ -86,7 +109,6 @@ pub fn check_cell(
             clicked.map(|(entity, cell, flag)| (entity, cell.clone(), flag.map(|c| c.clone())));
         if let Some(data) = center_cell {
             if grid.is_bomb_cell(&data.1) && data.2.is_none() {
-                app_state.set(AppState::End);
                 end_state.set(EndState::Lose);
             }
             clearing_cells.cells.push(data);
@@ -158,14 +180,12 @@ pub fn check_win(
     cells: Query<&Cell>,
     visible_cells: Query<&Visible>,
     flagged: Query<&Cell, With<Flag>>,
-    mut app_state: ResMut<NextState<AppState>>,
     mut end_state: ResMut<NextState<EndState>>,
 ) {
     let bombs = grid.bombs();
     if cells.iter().len() - bombs.len() == visible_cells.iter().len()
         && flagged.iter().len() == bombs.len()
     {
-        app_state.set(AppState::End);
         end_state.set(EndState::Win);
     }
 }
@@ -249,4 +269,5 @@ pub fn cleanup(entities: Query<Entity, With<GameComponent>>, mut commands: Comma
     commands.remove_resource::<TextGrid>();
     commands.remove_resource::<ClearingCells>();
     commands.remove_resource::<GameData>();
+    commands.remove_resource::<NTimer>();
 }
