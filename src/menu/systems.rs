@@ -1,9 +1,10 @@
+use crate::menu::{control_buttons, MenuState};
 use crate::{AppState, GameSettings};
 use bevy::app::AppExit;
 use bevy::prelude::*;
 use bevy_egui::egui::FontFamily::Proportional;
 use bevy_egui::egui::TextStyle::{Body, Heading, Monospace, Small};
-use bevy_egui::egui::{emath, FontId};
+use bevy_egui::egui::{FontId};
 use bevy_egui::{egui, EguiContexts};
 
 pub fn despawn_ui<T: Component>(
@@ -20,6 +21,8 @@ pub fn draw_ui(
     mut app_exit_events: EventWriter<AppExit>,
     mut app_state: ResMut<NextState<AppState>>,
     mut commands: Commands,
+    current_state: Res<State<MenuState>>,
+    mut next_state: ResMut<NextState<MenuState>>,
 ) {
     let ctx = ctx.ctx_mut();
     ctx.style_mut(|style| {
@@ -42,24 +45,31 @@ pub fn draw_ui(
             });
         });
     });
-    egui::CentralPanel::default().show(ctx, |ui| {
-        ui.horizontal_centered(|ui| {
-            ui.vertical_centered(|ui| {
-                ui.allocate_space(emath::Vec2::new(1.0, 100.0));
-                if ui.button("Play").clicked() {
-                    app_state.set(AppState::Playing);
-                    commands.insert_resource(GameSettings {
-                        width: 20,
-                        height: 20,
-                        bombs: 40,
-                    });
-                }
-                if ui.button("Exit").clicked() {
-                    app_exit_events.send(AppExit);
-                }
+
+    match current_state.get() {
+        MenuState::None => {
+            egui::CentralPanel::default().show(ctx, |ui| {
+                control_buttons(
+                    ui,
+                    &mut app_state,
+                    &mut commands,
+                    &mut next_state,
+                    &mut app_exit_events,
+                );
             });
-        });
-    });
+        }
+        MenuState::Customizing => {
+            egui::SidePanel::left("left").show(ctx, |ui| {
+                control_buttons(
+                    ui,
+                    &mut app_state,
+                    &mut commands,
+                    &mut next_state,
+                    &mut app_exit_events,
+                );
+            });
+        }
+    }
 }
 
 pub fn cleanup(nodes: Query<Entity, With<Node>>, mut commands: Commands) {
