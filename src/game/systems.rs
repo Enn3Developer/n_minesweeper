@@ -49,8 +49,13 @@ pub fn clear_cells(
         }
     }
 
-    for (entity, cell, flag) in checking_cells {
-        if grid.is_bomb_cell(&cell) || flag.is_some() {
+    for (entity, cell) in checking_cells {
+        if grid.is_bomb_cell(&cell)
+            || cells
+                .iter()
+                .find(|d| d.1 == &cell)
+                .is_some_and(|d| d.2.is_some())
+        {
             continue;
         }
 
@@ -71,11 +76,7 @@ pub fn clear_cells(
                 .iter()
                 .filter(|(_, _, flag, visible)| flag.is_none() && visible.is_none())
                 .filter(|(_, c, _, _)| cell.is_near(c) && !grid.is_bomb_cell(c))
-                .for_each(|(entity, cell, flag, _)| {
-                    clearing_cells
-                        .cells
-                        .push((entity, cell.clone(), flag.map(|c| c.clone())))
-                });
+                .for_each(|(entity, cell, _, _)| clearing_cells.cells.push((entity, cell.clone())));
         }
         change_color(&mut commands, entity, game_data.cell_color());
     }
@@ -107,11 +108,11 @@ pub fn check_cell(
         );
         let center_cell =
             clicked.map(|(entity, cell, flag)| (entity, cell.clone(), flag.map(|c| c.clone())));
-        if let Some(data) = center_cell {
-            if grid.is_bomb_cell(&data.1) && data.2.is_none() {
+        if let Some((entity, cell, flag)) = center_cell {
+            if grid.is_bomb_cell(&cell) && flag.is_none() {
                 end_state.set(EndState::Lose);
             }
-            clearing_cells.cells.push(data);
+            clearing_cells.cells.push((entity, cell));
         }
     }
 }

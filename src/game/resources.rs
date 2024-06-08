@@ -1,4 +1,4 @@
-use crate::game::components::{Cell, Flag};
+use crate::game::components::Cell;
 use bevy::prelude::*;
 use rand::distributions::Uniform;
 use rand::prelude::StdRng;
@@ -86,7 +86,7 @@ impl TextGrid {
 
 #[derive(Resource, Default)]
 pub struct ClearingCells {
-    pub(crate) cells: Vec<(Entity, Cell, Option<Flag>)>,
+    pub(crate) cells: Vec<(Entity, Cell)>,
 }
 
 #[derive(Resource, Default)]
