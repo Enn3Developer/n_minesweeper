@@ -98,6 +98,13 @@ pub fn check_cell(
         .cursor_position()
         .and_then(|cursor| camera.viewport_to_world_2d(transform, cursor))
     {
+        if world_position.x < 0.0
+            || world_position.y < 0.0
+            || world_position.x > 600.0
+            || world_position.y > 600.0
+        {
+            return;
+        }
         let clicked_cell = grid.global_to_grid(world_position.x, world_position.y);
         let clicked = cells
             .iter()
