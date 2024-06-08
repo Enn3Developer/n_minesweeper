@@ -106,7 +106,7 @@ impl GameData {
         };
         self.text_styles.push(style);
         let style = TextStyle {
-            color: Color::BLACK,
+            color: Color::WHITE,
             font_size: 24.0,
             font: server.load("embedded://n_minesweeper/fonts/NotoEmoji.ttf"),
         };
