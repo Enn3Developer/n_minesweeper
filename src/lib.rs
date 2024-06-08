@@ -7,6 +7,7 @@ use crate::game::Game;
 use crate::menu::Menu;
 use bevy::app::PluginGroupBuilder;
 use bevy::prelude::*;
+use bevy::render::camera::ScalingMode;
 use bevy::time::Stopwatch;
 
 pub struct NMines;
@@ -14,10 +15,34 @@ pub struct NMines;
 impl PluginGroup for NMines {
     fn build(self) -> PluginGroupBuilder {
         PluginGroupBuilder::start::<Self>()
+            .add(NStartup)
             .add(Game)
             .add(End)
             .add(Menu)
     }
+}
+
+pub struct NStartup;
+
+impl Plugin for NStartup {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Startup, (init, setup));
+    }
+}
+
+pub fn init(mut windows: Query<&mut Window>) {
+    let mut window = windows.single_mut();
+    window.resolution.set(600.0, 600.0);
+    window.resize_constraints.min_height = 600.0;
+    window.resize_constraints.min_width = 600.0;
+    window.title = String::from("N Mines");
+}
+
+pub fn setup(mut commands: Commands) {
+    let mut camera = Camera2dBundle::default();
+    camera.transform.translation = Vec3::new(600.0 / 2.0, 600.0 / 2.0, 1000.0);
+    camera.projection.scaling_mode = ScalingMode::WindowSize(1.0);
+    commands.spawn(camera);
 }
 
 #[derive(States, Debug, Clone, Eq, PartialEq, Hash, Default)]

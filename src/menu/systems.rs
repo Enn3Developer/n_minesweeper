@@ -1,19 +1,10 @@
 use crate::AppState;
 use bevy::app::AppExit;
 use bevy::prelude::*;
-use bevy::render::camera::ScalingMode;
 use bevy_egui::egui::FontFamily::Proportional;
 use bevy_egui::egui::TextStyle::{Body, Heading, Monospace, Small};
 use bevy_egui::egui::{emath, FontId};
 use bevy_egui::{egui, EguiContexts};
-
-pub fn init(mut windows: Query<&mut Window>) {
-    let mut window = windows.single_mut();
-    window.resolution.set(600.0, 600.0);
-    window.resize_constraints.min_height = 600.0;
-    window.resize_constraints.min_width = 600.0;
-    window.title = String::from("N Mines");
-}
 
 pub fn despawn_ui<T: Component>(
     mut commands: Commands,
@@ -22,13 +13,6 @@ pub fn despawn_ui<T: Component>(
     query
         .iter()
         .for_each(|e| commands.entity(e).despawn_recursive());
-}
-
-pub fn setup(mut commands: Commands) {
-    let mut camera = Camera2dBundle::default();
-    camera.transform.translation = Vec3::new(600.0 / 2.0, 600.0 / 2.0, 1000.0);
-    camera.projection.scaling_mode = ScalingMode::WindowSize(1.0);
-    commands.spawn(camera);
 }
 
 pub fn draw_ui(

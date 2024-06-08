@@ -11,7 +11,6 @@ pub struct Menu;
 impl Plugin for Menu {
     fn build(&self, app: &mut App) {
         app.add_plugins(EguiPlugin)
-            .add_systems(OnEnter(AppState::MainMenu), (init, setup))
             .add_systems(OnExit(AppState::MainMenu), cleanup)
             .add_systems(Update, draw_ui.run_if(in_state(AppState::MainMenu)));
     }
