@@ -6,6 +6,7 @@ use crate::end::End;
 use crate::game::Game;
 use crate::menu::Menu;
 use bevy::app::PluginGroupBuilder;
+use bevy::input::keyboard::KeyboardInput;
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 use bevy::time::Stopwatch;
@@ -26,7 +27,8 @@ pub struct NStartup;
 
 impl Plugin for NStartup {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, (init, setup));
+        app.add_systems(Startup, (init, setup))
+            .add_systems(Update, move_camera.run_if(in_state(AppState::Playing)));
     }
 }
 
@@ -43,6 +45,35 @@ pub fn setup(mut commands: Commands) {
     camera.transform.translation = Vec3::new(600.0 / 2.0, 600.0 / 2.0, 1000.0);
     camera.projection.scaling_mode = ScalingMode::WindowSize(1.0);
     commands.spawn(camera);
+}
+
+pub fn move_camera(
+    mut cameras: Query<&mut Transform, With<Camera>>,
+    mut keyboard_input_events: EventReader<KeyboardInput>,
+    time: Res<Time>,
+) {
+    let mut transform = cameras.single_mut();
+    let mut movement = Vec2::ZERO;
+    let speed = 150.0;
+    for event in keyboard_input_events.read() {
+        match event.key_code {
+            KeyCode::KeyW => {
+                movement += Vec2::Y;
+            }
+            KeyCode::KeyS => {
+                movement -= Vec2::Y;
+            }
+            KeyCode::KeyA => {
+                movement -= Vec2::X;
+            }
+            KeyCode::KeyD => {
+                movement += Vec2::X;
+            }
+            _ => {}
+        }
+    }
+
+    transform.translation += (movement * speed * time.delta_seconds()).extend(0.0);
 }
 
 #[derive(States, Debug, Clone, Eq, PartialEq, Hash, Default)]
