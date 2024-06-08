@@ -28,7 +28,8 @@ impl Plugin for Game {
                             .before(check_cell)
                             .before(clear_cells),
                     )
-                        .before(check_win),
+                        .before(check_win)
+                        .run_if(in_state(EndState::NotEnded)),
                     tick_timer.run_if(not(in_state(EndState::NotEnded))),
                 )
                     .run_if(in_state(AppState::Playing)),
