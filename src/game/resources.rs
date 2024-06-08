@@ -99,14 +99,17 @@ impl GameData {
     pub fn setup(&mut self, materials: &mut Assets<ColorMaterial>, server: &AssetServer) {
         self.colors.push(materials.add(Color::rgb(1.0, 1.0, 1.0)));
         self.colors.push(materials.add(Color::rgb(0.0, 0.0, 0.0)));
-        let mut style = TextStyle::default();
-        style.color = Color::BLACK;
-        style.font_size = 24.0;
+        let style = TextStyle {
+            color: Color::BLACK,
+            font_size: 24.0,
+            ..default()
+        };
         self.text_styles.push(style);
-        let mut style = TextStyle::default();
-        style.color = Color::WHITE;
-        style.font_size = 24.0;
-        style.font = server.load("embedded://n_minesweeper/fonts/NotoEmoji.ttf");
+        let style = TextStyle {
+            color: Color::BLACK,
+            font_size: 24.0,
+            font: server.load("embedded://n_minesweeper/fonts/NotoEmoji.ttf"),
+        };
         self.text_styles.push(style);
     }
 

@@ -5,6 +5,8 @@ use crate::{AppState, EndState, NStopWatch};
 use bevy::prelude::*;
 use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
 
+type NotModified = (Without<Flag>, Without<Visible>);
+
 pub fn update_time(time: Res<Time>, mut stop_watch: ResMut<NStopWatch>) {
     stop_watch.0.tick(time.delta());
 }
@@ -97,17 +99,10 @@ pub fn check_cell(
         .and_then(|cursor| camera.viewport_to_world_2d(transform, cursor))
     {
         let clicked_cell = grid.global_to_grid(world_position.x, world_position.y);
-        let clicked = cells.iter().find(
-            |(_entity, cell, _)| {
-                if &&clicked_cell == cell {
-                    true
-                } else {
-                    false
-                }
-            },
-        );
-        let center_cell =
-            clicked.map(|(entity, cell, flag)| (entity, cell.clone(), flag.map(|c| c.clone())));
+        let clicked = cells
+            .iter()
+            .find(|(_entity, cell, _)| &&clicked_cell == cell);
+        let center_cell = clicked.map(|(entity, cell, flag)| (entity, cell.clone(), flag.cloned()));
         if let Some((entity, cell, flag)) = center_cell {
             if grid.is_bomb_cell(&cell) && flag.is_none() {
                 end_state.set(EndState::Lose);
@@ -120,7 +115,7 @@ pub fn check_cell(
 pub fn add_flag(
     windows: Query<&Window>,
     cameras: Query<(&Camera, &GlobalTransform)>,
-    cells: Query<(Entity, &Cell), (Without<Flag>, Without<Visible>)>,
+    cells: Query<(Entity, &Cell), NotModified>,
     grid: Res<Grid>,
     game_data: Res<GameData>,
     mut commands: Commands,
