@@ -69,6 +69,7 @@ pub struct GameSettings {
     pub width: u32,
     pub height: u32,
     pub bombs: u32,
+    pub speed: u32,
 }
 
 impl Default for GameSettings {
@@ -77,6 +78,7 @@ impl Default for GameSettings {
             width: 20,
             height: 20,
             bombs: 40,
+            speed: 8,
         }
     }
 }

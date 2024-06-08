@@ -42,11 +42,12 @@ pub fn clear_cells(
     cells: Query<(Entity, &Cell, Option<&Flag>, Option<&Visible>)>,
     grid: Res<Grid>,
     game_data: Res<GameData>,
+    game_settings: Res<GameSettings>,
 ) {
-    let mut checking_cells = Vec::with_capacity(8);
+    let mut checking_cells = Vec::with_capacity(game_settings.speed as usize);
     while let Some(cell) = clearing_cells.cells.pop() {
         checking_cells.push(cell);
-        if checking_cells.len() == 8 {
+        if checking_cells.len() == game_settings.speed as usize {
             break;
         }
     }
