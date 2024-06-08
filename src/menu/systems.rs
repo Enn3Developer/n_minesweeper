@@ -51,6 +51,10 @@ pub fn draw_ui(
     egui::TopBottomPanel::top("title").show(ctx, |ui| {
         ui.vertical_centered(|ui| {
             ui.heading("N Mines");
+            ui.horizontal_centered(|ui| {
+                ui.add_space(1.0);
+                ui.label(format!("v{}", env!("CARGO_PKG_VERSION")));
+            });
         });
     });
     egui::CentralPanel::default().show(ctx, |ui| {
