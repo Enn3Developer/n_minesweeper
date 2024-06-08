@@ -221,21 +221,28 @@ pub fn grid_setup(
                 MaterialMesh2dBundle {
                     mesh: Mesh2dHandle(vertical_line.clone()),
                     material: line_color.clone(),
-                    transform: Transform::from_xyz(x as f32 * cell_width, 300.0, 1.0),
-                    ..default()
-                },
-                GameComponent,
-            ));
-            line_meshes.push((
-                MaterialMesh2dBundle {
-                    mesh: Mesh2dHandle(horizontal_line.clone()),
-                    material: line_color.clone(),
-                    transform: Transform::from_xyz(300.0, x as f32 * cell_height, 1.0),
+                    transform: Transform::from_xyz(x as f32 * cell_width, height as f32 / 2.0, 1.0),
                     ..default()
                 },
                 GameComponent,
             ));
         }
+    }
+    for y in 0..grid_height {
+        if y > 0 {
+            line_meshes.push((
+                MaterialMesh2dBundle {
+                    mesh: Mesh2dHandle(horizontal_line.clone()),
+                    material: line_color.clone(),
+                    transform: Transform::from_xyz(width as f32 / 2.0, y as f32 * cell_height, 1.0),
+                    ..default()
+                },
+                GameComponent,
+            ));
+        }
+    }
+
+    for x in 0..grid_width {
         for y in 0..grid_height {
             cell_meshes.push((
                 MaterialMesh2dBundle {
