@@ -98,13 +98,6 @@ pub fn check_cell(
         .cursor_position()
         .and_then(|cursor| camera.viewport_to_world_2d(transform, cursor))
     {
-        if world_position.x < 0.0
-            || world_position.y < 0.0
-            || world_position.x > 600.0
-            || world_position.y > 600.0
-        {
-            return;
-        }
         let clicked_cell = grid.global_to_grid(world_position.x, world_position.y);
         let clicked = cells
             .iter()
@@ -200,12 +193,12 @@ pub fn grid_setup(
     server: Res<AssetServer>,
     game_settings: Res<GameSettings>,
 ) {
-    let width = 600;
-    let height = width;
     let grid_width = game_settings.width;
     let grid_height = game_settings.height;
-    let cell_width = width as f32 / grid_width as f32;
-    let cell_height = height as f32 / grid_height as f32;
+    let cell_width = 30.0;
+    let cell_height = 30.0;
+    let width = grid_width * cell_width as u32;
+    let height = grid_height * cell_height as u32;
     let mut grid = Grid::new(grid_width, grid_height, width, height);
     grid.generate(game_settings.bombs);
     let mut game_data = GameData::default();
@@ -256,7 +249,7 @@ pub fn grid_setup(
                     ..default()
                 },
                 GameComponent,
-                Cell::new(x, y),
+                Cell::new(x as f32, y as f32),
             ));
         }
     }

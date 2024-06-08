@@ -29,15 +29,15 @@ impl Grid {
         while bombs > 0 {
             let x = rng.sample(Uniform::new(0, self.grid_width));
             let y = rng.sample(Uniform::new(0, self.grid_height));
-            if self.is_bomb(x, y) {
+            if self.is_bomb(x as f32, y as f32) {
                 continue;
             }
-            self.bombs.push(Cell::new(x, y));
+            self.bombs.push(Cell::new(x as f32, y as f32));
             bombs -= 1;
         }
     }
 
-    pub fn is_bomb(&self, x: u32, y: u32) -> bool {
+    pub fn is_bomb(&self, x: f32, y: f32) -> bool {
         for bomb in &self.bombs {
             if bomb.x == x && bomb.y == y {
                 return true;
@@ -56,15 +56,15 @@ impl Grid {
 
     pub fn global_to_grid(&self, x: f32, y: f32) -> Cell {
         Cell::new(
-            (x / self.width as f32 * self.grid_width as f32).floor() as u32,
-            (y / self.height as f32 * self.grid_height as f32).floor() as u32,
+            (x / self.width as f32 * self.grid_width as f32).floor(),
+            (y / self.height as f32 * self.grid_height as f32).floor(),
         )
     }
 
     pub fn grid_to_global(&self, cell: &Cell) -> (f32, f32) {
         (
-            (cell.x as f32 + 0.5) * self.width as f32 / self.grid_width as f32,
-            (cell.y as f32 + 0.5) * self.height as f32 / self.grid_height as f32,
+            (cell.x + 0.5) * self.width as f32 / self.grid_width as f32,
+            (cell.y + 0.5) * self.height as f32 / self.grid_height as f32,
         )
     }
 }
