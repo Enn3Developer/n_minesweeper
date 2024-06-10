@@ -31,12 +31,14 @@ pub fn show_bombs(mut commands: Commands, grid: Res<Grid>, mut cells: Query<(&mu
 
 pub fn change_all(
     mut change_cells: ResMut<ChangeCells>,
-    mut cells: Query<(&mut Handle<Image>, &Cell)>,
+    mut cells: Query<(Entity, &mut Handle<Image>, &Cell)>,
+    mut commands: Commands,
     game_data: Res<GameData>,
 ) {
     while let Some(cell) = change_cells.cells.pop() {
-        if let Some((mut image, _)) = cells.iter_mut().find(|(_, c)| &&cell == c) {
+        if let Some((entity, mut image, _)) = cells.iter_mut().find(|(_, _, c)| &&cell == c) {
             change_cell(image.as_mut(), game_data.open_cell());
+            commands.entity(entity).insert(Visible);
         }
     }
 }
