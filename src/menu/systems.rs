@@ -68,7 +68,7 @@ pub fn draw_ui(
                     egui::Slider::new(&mut game_settings.bombs, 1..=100)
                         .text("Bombs")
                         .ui(ui);
-                    egui::Slider::new(&mut game_settings.speed, 1..=32)
+                    egui::Slider::new(&mut game_settings.speed, 1..=128)
                         .text("Speed")
                         .ui(ui);
                 });

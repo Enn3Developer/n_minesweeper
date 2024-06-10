@@ -6,7 +6,7 @@ use crate::end::End;
 use crate::game::Game;
 use crate::menu::Menu;
 use bevy::app::PluginGroupBuilder;
-use bevy::input::keyboard::KeyboardInput;
+use bevy::input::keyboard::{keyboard_input_system, KeyboardInput};
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 use bevy::time::Stopwatch;
@@ -49,28 +49,23 @@ pub fn setup(mut commands: Commands) {
 
 pub fn move_camera(
     mut cameras: Query<&mut Transform, With<Camera>>,
-    mut keyboard_input_events: EventReader<KeyboardInput>,
+    button_input: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
 ) {
     let mut transform = cameras.single_mut();
     let mut movement = Vec2::ZERO;
     let speed = 250.0;
-    for event in keyboard_input_events.read() {
-        match event.key_code {
-            KeyCode::KeyW => {
-                movement += Vec2::Y;
-            }
-            KeyCode::KeyS => {
-                movement -= Vec2::Y;
-            }
-            KeyCode::KeyA => {
-                movement -= Vec2::X;
-            }
-            KeyCode::KeyD => {
-                movement += Vec2::X;
-            }
-            _ => {}
-        }
+    if button_input.any_pressed([KeyCode::KeyW, KeyCode::ArrowUp]) {
+        movement += Vec2::Y;
+    }
+    if button_input.any_pressed([KeyCode::KeyS, KeyCode::ArrowDown]) {
+        movement -= Vec2::Y;
+    }
+    if button_input.any_pressed([KeyCode::KeyA, KeyCode::ArrowLeft]) {
+        movement -= Vec2::X;
+    }
+    if button_input.any_pressed([KeyCode::KeyD, KeyCode::ArrowRight]) {
+        movement += Vec2::X;
     }
 
     transform.translation += (movement * speed * time.delta_seconds()).extend(0.0);

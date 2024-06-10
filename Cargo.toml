@@ -1,7 +1,7 @@
 cargo-features = ["codegen-backend"]
 [package]
 name = "n_minesweeper"
-version = "0.7.0"
+version = "0.8.0"
 edition = "2021"
 
 [dependencies]

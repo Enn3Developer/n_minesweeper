@@ -52,10 +52,12 @@ pub fn clear_cells(
     grid: Res<Grid>,
     game_data: Res<GameData>,
     game_settings: Res<GameSettings>,
+    time: Res<Time>,
 ) {
     let mut popped = 0;
-    while let Some((entity, cell)) = clearing_cells.cells.pop() {
-        println!("{cell:?}");
+    let mut local_tried = vec![];
+    while let Some((entity, cell)) = clearing_cells.cells.pop_front() {
+        local_tried.push(cell.clone());
         if grid.is_bomb_cell(&cell)
             || cells
                 .iter()
@@ -81,16 +83,27 @@ pub fn clear_cells(
             cells
                 .iter()
                 .filter(|(_, _, flag, visible)| flag.is_none() && visible.is_none())
-                .filter(|(_, c, _, _)| cell.is_near(c) && !grid.is_bomb_cell(c) && &&cell != c)
-                .for_each(|(entity, cell, _, _)| clearing_cells.cells.push((entity, cell.clone())));
+                .filter(|(_, c, _, _)| {
+                    cell.is_near(c)
+                        && !grid.is_bomb_cell(c)
+                        && &&cell != c
+                        && !local_tried.contains(c)
+                })
+                .for_each(|(entity, cell, _, _)| {
+                    clearing_cells.cells.push_back((entity, cell.clone()))
+                });
         }
         commands.entity(entity).insert(Tried);
         change_cells.cells.push(cell);
         popped += 1;
-        if popped == game_settings.speed {
+        if popped == (game_settings.speed as f32 / (time.delta_seconds() * 16.0)) as u32 {
             break;
         }
     }
+
+    clearing_cells
+        .cells
+        .retain(|(_, cell)| cells.iter().find(|(_, c, _, _)| &cell == c).is_some());
 }
 
 pub fn check_cell(
@@ -114,7 +127,7 @@ pub fn check_cell(
             if grid.is_bomb_cell(&cell) && flag.is_none() {
                 end_state.set(EndState::Lose);
             }
-            clearing_cells.cells.push((entity, cell));
+            clearing_cells.cells.push_back((entity, cell));
         }
     }
 }

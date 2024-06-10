@@ -4,6 +4,7 @@ use bevy::prelude::*;
 use rand::distributions::Uniform;
 use rand::prelude::StdRng;
 use rand::{Rng, SeedableRng};
+use std::collections::VecDeque;
 
 #[derive(Resource)]
 pub struct Grid {
@@ -87,7 +88,7 @@ impl TextGrid {
 
 #[derive(Resource, Default)]
 pub struct ClearingCells {
-    pub(crate) cells: Vec<(Entity, Cell)>,
+    pub(crate) cells: VecDeque<(Entity, Cell)>,
 }
 
 #[derive(Resource, Default)]
