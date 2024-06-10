@@ -24,6 +24,8 @@ pub enum MenuState {
     #[default]
     None,
     Customizing,
+    Multiplayer,
+    MultiplayerJoin,
 }
 
 pub fn control_buttons(
@@ -40,6 +42,9 @@ pub fn control_buttons(
         }
         if ui.button("Customize").clicked() {
             next_state.set(MenuState::Customizing);
+        }
+        if ui.button("Multiplayer").clicked() {
+            next_state.set(MenuState::Multiplayer);
         }
         if ui.button("Exit").clicked() {
             app_exit_events.send(AppExit);

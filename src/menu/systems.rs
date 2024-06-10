@@ -74,6 +74,32 @@ pub fn draw_ui(
                 });
             });
         }
+        MenuState::Multiplayer => {
+            egui::SidePanel::left("left").show(ctx, |ui| {
+                control_buttons(ui, &mut app_state, &mut next_state, &mut app_exit_events);
+            });
+            egui::CentralPanel::default().show(ctx, |ui| {
+                ui.vertical_centered(|ui| {
+                    ui.allocate_space(emath::Vec2::new(1.0, 100.0));
+                    if ui.button("Create").clicked() {}
+                    if ui.button("Join").clicked() {
+                        next_state.set(MenuState::MultiplayerJoin);
+                    }
+                });
+            });
+        }
+        MenuState::MultiplayerJoin => {
+            egui::SidePanel::left("left").show(ctx, |ui| {
+                control_buttons(ui, &mut app_state, &mut next_state, &mut app_exit_events);
+            });
+            egui::CentralPanel::default().show(ctx, |ui| {
+                ui.vertical_centered(|ui| {
+                    ui.allocate_space(emath::Vec2::new(1.0, 100.0));
+                    ui.label("Write ID");
+                    if ui.button("Join").clicked() {}
+                });
+            });
+        }
     }
 }
 

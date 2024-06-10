@@ -6,7 +6,6 @@ use crate::end::End;
 use crate::game::Game;
 use crate::menu::Menu;
 use bevy::app::PluginGroupBuilder;
-use bevy::input::keyboard::{keyboard_input_system, KeyboardInput};
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 use bevy::time::Stopwatch;
