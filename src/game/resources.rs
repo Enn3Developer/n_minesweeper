@@ -1,4 +1,5 @@
 use crate::game::components::Cell;
+use crate::get_path;
 use bevy::prelude::*;
 use rand::distributions::Uniform;
 use rand::prelude::StdRng;
@@ -90,15 +91,21 @@ pub struct ClearingCells {
 }
 
 #[derive(Resource, Default)]
+pub struct ChangeCells {
+    pub(crate) cells: Vec<Cell>,
+}
+
+#[derive(Resource, Default)]
 pub struct GameData {
-    colors: Vec<Handle<ColorMaterial>>,
+    images: Vec<Handle<Image>>,
     text_styles: Vec<TextStyle>,
 }
 
 impl GameData {
-    pub fn setup(&mut self, materials: &mut Assets<ColorMaterial>, server: &AssetServer) {
-        self.colors.push(materials.add(Color::rgb(1.0, 1.0, 1.0)));
-        self.colors.push(materials.add(Color::rgb(0.0, 0.0, 0.0)));
+    pub fn setup(&mut self, server: &AssetServer) {
+        self.images
+            .push(server.load(get_path("textures/closed.png")));
+        self.images.push(server.load(get_path("textures/open.png")));
         let style = TextStyle {
             color: Color::BLACK,
             font_size: 24.0,
@@ -106,18 +113,19 @@ impl GameData {
         };
         self.text_styles.push(style);
         let style = TextStyle {
-            color: Color::WHITE,
+            color: Color::BLACK,
             font_size: 24.0,
-            font: server.load("embedded://n_minesweeper/fonts/NotoEmoji.ttf"),
+            font: server.load(get_path("fonts/NotoEmoji.ttf")),
         };
         self.text_styles.push(style);
     }
 
-    pub fn cell_color(&self) -> Handle<ColorMaterial> {
-        self.colors[0].clone()
+    pub fn closed_cell(&self) -> Handle<Image> {
+        self.images[0].clone()
     }
-    pub fn bomb_color(&self) -> Handle<ColorMaterial> {
-        self.colors[1].clone()
+
+    pub fn open_cell(&self) -> Handle<Image> {
+        self.images[1].clone()
     }
 
     pub fn normal_text(&self) -> TextStyle {

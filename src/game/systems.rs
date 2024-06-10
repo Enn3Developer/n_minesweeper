@@ -1,9 +1,8 @@
 use crate::game::components::*;
-use crate::game::resources::{ClearingCells, GameData, NTimer};
+use crate::game::resources::{ChangeCells, ClearingCells, GameData, NTimer};
 use crate::game::*;
-use crate::{AppState, EndState, GameSettings, NStopWatch};
+use crate::{get_path, AppState, EndState, GameSettings, NStopWatch};
 use bevy::prelude::*;
-use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
 
 type NotModified = (Without<Flag>, Without<Visible>);
 
@@ -21,38 +20,40 @@ pub fn tick_timer(
     }
 }
 
-pub fn show_bombs(
-    mut commands: Commands,
-    grid: Res<Grid>,
-    cells: Query<(Entity, &Cell)>,
-    game_data: Res<GameData>,
-) {
+pub fn show_bombs(mut commands: Commands, grid: Res<Grid>, mut cells: Query<(&mut Sprite, &Cell)>) {
     commands.insert_resource(NTimer(Timer::from_seconds(2.0, TimerMode::Once)));
-    cells.iter().for_each(|(entity, cell)| {
+    cells.iter_mut().for_each(|(mut sprite, cell)| {
         if grid.is_bomb_cell(cell) {
-            change_color(&mut commands, entity, game_data.bomb_color());
+            sprite.color = Color::BLACK;
         }
     });
 }
 
+pub fn change_all(
+    mut change_cells: ResMut<ChangeCells>,
+    mut cells: Query<(&mut Handle<Image>, &Cell)>,
+    game_data: Res<GameData>,
+) {
+    while let Some(cell) = change_cells.cells.pop() {
+        if let Some((mut image, _)) = cells.iter_mut().find(|(_, c)| &&cell == c) {
+            change_cell(image.as_mut(), game_data.open_cell());
+        }
+    }
+}
+
 pub fn clear_cells(
     mut clearing_cells: ResMut<ClearingCells>,
+    mut change_cells: ResMut<ChangeCells>,
     mut text_grid: ResMut<TextGrid>,
     mut commands: Commands,
-    cells: Query<(Entity, &Cell, Option<&Flag>, Option<&Visible>)>,
+    cells: Query<(Entity, &Cell, Option<&Flag>, Option<&Visible>), Without<Tried>>,
     grid: Res<Grid>,
     game_data: Res<GameData>,
     game_settings: Res<GameSettings>,
 ) {
-    let mut checking_cells = Vec::with_capacity(game_settings.speed as usize);
-    while let Some(cell) = clearing_cells.cells.pop() {
-        checking_cells.push(cell);
-        if checking_cells.len() == game_settings.speed as usize {
-            break;
-        }
-    }
-
-    for (entity, cell) in checking_cells {
+    let mut popped = 0;
+    while let Some((entity, cell)) = clearing_cells.cells.pop() {
+        println!("{cell:?}");
         if grid.is_bomb_cell(&cell)
             || cells
                 .iter()
@@ -78,10 +79,15 @@ pub fn clear_cells(
             cells
                 .iter()
                 .filter(|(_, _, flag, visible)| flag.is_none() && visible.is_none())
-                .filter(|(_, c, _, _)| cell.is_near(c) && !grid.is_bomb_cell(c))
+                .filter(|(_, c, _, _)| cell.is_near(c) && !grid.is_bomb_cell(c) && &&cell != c)
                 .for_each(|(entity, cell, _, _)| clearing_cells.cells.push((entity, cell.clone())));
         }
-        change_color(&mut commands, entity, game_data.cell_color());
+        commands.entity(entity).insert(Tried);
+        change_cells.cells.push(cell);
+        popped += 1;
+        if popped == game_settings.speed {
+            break;
+        }
     }
 }
 
@@ -100,9 +106,7 @@ pub fn check_cell(
         .and_then(|cursor| camera.viewport_to_world_2d(transform, cursor))
     {
         let clicked_cell = grid.global_to_grid(world_position.x, world_position.y);
-        let clicked = cells
-            .iter()
-            .find(|(_entity, cell, _)| &&clicked_cell == cell);
+        let clicked = cells.iter().find(|(_, cell, _)| &&clicked_cell == cell);
         let center_cell = clicked.map(|(entity, cell, flag)| (entity, cell.clone(), flag.cloned()));
         if let Some((entity, cell, flag)) = center_cell {
             if grid.is_bomb_cell(&cell) && flag.is_none() {
@@ -188,9 +192,7 @@ pub fn check_win(
 }
 
 pub fn grid_setup(
-    mut meshes: ResMut<Assets<Mesh>>,
     mut commands: Commands,
-    mut materials: ResMut<Assets<ColorMaterial>>,
     server: Res<AssetServer>,
     game_settings: Res<GameSettings>,
 ) {
@@ -203,52 +205,37 @@ pub fn grid_setup(
     let mut grid = Grid::new(grid_width, grid_height, width, height);
     grid.generate(game_settings.bombs);
     let mut game_data = GameData::default();
-    game_data.setup(&mut materials, &server);
+    game_data.setup(&server);
     commands.insert_resource(grid);
     commands.insert_resource(game_data);
     commands.insert_resource(TextGrid::default());
     commands.insert_resource(ClearingCells::default());
+    commands.insert_resource(ChangeCells::default());
     commands.insert_resource(NStopWatch::default());
-    let cell_color = materials.add(Color::rgb(1.0, 0.27, 0.0));
-    let line_color = materials.add(Color::rgb(0.2, 0.2, 0.2));
-    let cell_rectangle = meshes.add(Rectangle::new(cell_width, cell_height));
-    let vertical_line = meshes.add(Rectangle::new(1.0, height as f32));
-    let horizontal_line = meshes.add(Rectangle::new(width as f32, 1.0));
-    let mut line_meshes = Vec::with_capacity((grid_width + grid_height) as usize);
+    SpriteBundle {
+        sprite: Sprite {
+            color: Default::default(),
+            flip_x: false,
+            flip_y: false,
+            custom_size: None,
+            rect: None,
+            anchor: Default::default(),
+        },
+        transform: Default::default(),
+        global_transform: Default::default(),
+        texture: Default::default(),
+        visibility: Default::default(),
+        inherited_visibility: Default::default(),
+        view_visibility: Default::default(),
+    };
+    let closed = server.load(get_path("textures/closed.png"));
     let mut cell_meshes = Vec::with_capacity((grid_width * grid_height) as usize);
-    for x in 0..grid_width {
-        if x > 0 {
-            line_meshes.push((
-                MaterialMesh2dBundle {
-                    mesh: Mesh2dHandle(vertical_line.clone()),
-                    material: line_color.clone(),
-                    transform: Transform::from_xyz(x as f32 * cell_width, height as f32 / 2.0, 1.0),
-                    ..default()
-                },
-                GameComponent,
-            ));
-        }
-    }
-    for y in 0..grid_height {
-        if y > 0 {
-            line_meshes.push((
-                MaterialMesh2dBundle {
-                    mesh: Mesh2dHandle(horizontal_line.clone()),
-                    material: line_color.clone(),
-                    transform: Transform::from_xyz(width as f32 / 2.0, y as f32 * cell_height, 1.0),
-                    ..default()
-                },
-                GameComponent,
-            ));
-        }
-    }
 
     for x in 0..grid_width {
         for y in 0..grid_height {
             cell_meshes.push((
-                MaterialMesh2dBundle {
-                    mesh: Mesh2dHandle(cell_rectangle.clone()),
-                    material: cell_color.clone(),
+                SpriteBundle {
+                    texture: closed.clone(),
                     transform: Transform::from_xyz(
                         (x as f32 + 0.5) * cell_width,
                         (y as f32 + 0.5) * cell_height,
@@ -262,7 +249,6 @@ pub fn grid_setup(
         }
     }
 
-    commands.spawn_batch(line_meshes);
     commands.spawn_batch(cell_meshes);
 }
 
@@ -273,6 +259,7 @@ pub fn cleanup(entities: Query<Entity, With<GameComponent>>, mut commands: Comma
     commands.remove_resource::<Grid>();
     commands.remove_resource::<TextGrid>();
     commands.remove_resource::<ClearingCells>();
+    commands.remove_resource::<ChangeCells>();
     commands.remove_resource::<GameData>();
     commands.remove_resource::<NTimer>();
 }

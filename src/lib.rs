@@ -54,7 +54,7 @@ pub fn move_camera(
 ) {
     let mut transform = cameras.single_mut();
     let mut movement = Vec2::ZERO;
-    let speed = 150.0;
+    let speed = 250.0;
     for event in keyboard_input_events.read() {
         match event.key_code {
             KeyCode::KeyW => {
@@ -74,6 +74,10 @@ pub fn move_camera(
     }
 
     transform.translation += (movement * speed * time.delta_seconds()).extend(0.0);
+}
+
+pub fn get_path(path: &str) -> String {
+    format!("embedded://n_minesweeper/../assets/{path}")
 }
 
 #[derive(States, Debug, Clone, Eq, PartialEq, Hash, Default)]
@@ -112,24 +116,4 @@ impl Default for GameSettings {
             speed: 8,
         }
     }
-}
-
-#[macro_export]
-macro_rules! embedded_asset {
-    ($app: ident, $path: expr) => {{
-        embedded_asset!($app, "src", $path)
-    }};
-
-    ($app: ident, $source_path: expr, $path: expr) => {{
-        embedded_asset!($app, $source_path, $path, $path)
-    }};
-
-    ($app: ident, $source_path: expr, $path: expr, $renamed: expr) => {{
-        let mut embedded = $app
-            .world
-            .resource_mut::<bevy::asset::io::embedded::EmbeddedAssetRegistry>();
-        let path = bevy::asset::embedded_path!($source_path, $renamed);
-        let watched_path = bevy::asset::io::embedded::watched_path(file!(), $path);
-        embedded.insert_asset(watched_path, &path, include_bytes!($path));
-    }};
 }

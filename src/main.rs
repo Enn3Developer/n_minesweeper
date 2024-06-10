@@ -1,5 +1,6 @@
+use bevy::asset::embedded_asset;
 use bevy::prelude::*;
-use n_minesweeper::{embedded_asset, AppState, EndState, NMines};
+use n_minesweeper::{AppState, EndState, NMines};
 
 fn main() {
     let mut app = App::new();
@@ -7,11 +8,8 @@ fn main() {
         .add_plugins(NMines)
         .init_state::<AppState>()
         .init_state::<EndState>();
-    embedded_asset!(
-        app,
-        "src",
-        "../assets/fonts/NotoEmoji.ttf",
-        "fonts/NotoEmoji.ttf"
-    );
+    embedded_asset!(app, "../assets/fonts/NotoEmoji.ttf");
+    embedded_asset!(app, "../assets/textures/closed.png");
+    embedded_asset!(app, "../assets/textures/open.png");
     app.run();
 }

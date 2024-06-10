@@ -11,6 +11,9 @@ pub struct Flag {
 #[derive(Component)]
 pub struct Visible;
 
+#[derive(Component)]
+pub struct Tried;
+
 #[derive(Component, PartialEq, Debug, Clone)]
 pub struct Cell {
     pub(crate) x: f32,

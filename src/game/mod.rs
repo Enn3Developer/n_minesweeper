@@ -30,6 +30,7 @@ impl Plugin for Game {
                     )
                         .before(check_win)
                         .run_if(in_state(EndState::NotEnded)),
+                    change_all,
                     tick_timer.run_if(not(in_state(EndState::NotEnded))),
                 )
                     .run_if(in_state(AppState::Playing)),
@@ -40,7 +41,7 @@ impl Plugin for Game {
 }
 
 pub fn get_bombs(
-    cells: &Query<(Entity, &Cell, Option<&Flag>, Option<&Visible>)>,
+    cells: &Query<(Entity, &Cell, Option<&Flag>, Option<&Visible>), Without<Tried>>,
     checking_cell: &Cell,
     grid: &Grid,
 ) -> u32 {
@@ -87,4 +88,8 @@ pub fn spawn_text<'a>(
 
 pub fn change_color(commands: &mut Commands, entity: Entity, color: Handle<ColorMaterial>) {
     commands.entity(entity).insert((color, Visible));
+}
+
+pub fn change_cell(cell_image: &mut Handle<Image>, image: Handle<Image>) {
+    *cell_image = image;
 }
