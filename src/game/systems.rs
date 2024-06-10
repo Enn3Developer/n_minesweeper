@@ -110,7 +110,8 @@ pub fn check_cell(
     windows: Query<&Window>,
     cells: Query<(Entity, &Cell, Option<&Flag>)>,
     cameras: Query<(&Camera, &GlobalTransform)>,
-    grid: Res<Grid>,
+    mut grid: ResMut<Grid>,
+    game_settings: Res<GameSettings>,
     mut clearing_cells: ResMut<ClearingCells>,
     mut end_state: ResMut<NextState<EndState>>,
 ) {
@@ -121,6 +122,9 @@ pub fn check_cell(
         .and_then(|cursor| camera.viewport_to_world_2d(transform, cursor))
     {
         let clicked_cell = grid.global_to_grid(world_position.x, world_position.y);
+        if grid.bombs().is_empty() {
+            grid.generate(game_settings.bombs, Some(clicked_cell.clone()));
+        }
         let clicked = cells.iter().find(|(_, cell, _)| &&clicked_cell == cell);
         let center_cell = clicked.map(|(entity, cell, flag)| (entity, cell.clone(), flag.cloned()));
         if let Some((entity, cell, flag)) = center_cell {
@@ -217,8 +221,7 @@ pub fn grid_setup(
     let cell_height = 30.0;
     let width = grid_width * cell_width as u32;
     let height = grid_height * cell_height as u32;
-    let mut grid = Grid::new(grid_width, grid_height, width, height);
-    grid.generate(game_settings.bombs);
+    let grid = Grid::new(grid_width, grid_height, width, height);
     let mut game_data = GameData::default();
     game_data.setup(&server);
     commands.insert_resource(grid);
@@ -227,22 +230,6 @@ pub fn grid_setup(
     commands.insert_resource(ClearingCells::default());
     commands.insert_resource(ChangeCells::default());
     commands.insert_resource(NStopWatch::default());
-    SpriteBundle {
-        sprite: Sprite {
-            color: Default::default(),
-            flip_x: false,
-            flip_y: false,
-            custom_size: None,
-            rect: None,
-            anchor: Default::default(),
-        },
-        transform: Default::default(),
-        global_transform: Default::default(),
-        texture: Default::default(),
-        visibility: Default::default(),
-        inherited_visibility: Default::default(),
-        view_visibility: Default::default(),
-    };
     let closed = server.load(get_path("textures/closed.png"));
     let mut cell_meshes = Vec::with_capacity((grid_width * grid_height) as usize);
 
@@ -250,6 +237,10 @@ pub fn grid_setup(
         for y in 0..grid_height {
             cell_meshes.push((
                 SpriteBundle {
+                    sprite: Sprite {
+                        custom_size: Some(Vec2::new(cell_width, cell_height)),
+                        ..default()
+                    },
                     texture: closed.clone(),
                     transform: Transform::from_xyz(
                         (x as f32 + 0.5) * cell_width,

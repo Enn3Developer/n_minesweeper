@@ -26,12 +26,16 @@ impl Grid {
         }
     }
 
-    pub fn generate(&mut self, mut bombs: u32) {
+    pub fn generate(&mut self, mut bombs: u32, no_bomb_zone: Option<Cell>) {
         let mut rng = StdRng::from_rng(rand::thread_rng()).unwrap();
         while bombs > 0 {
             let x = rng.sample(Uniform::new(0, self.grid_width));
             let y = rng.sample(Uniform::new(0, self.grid_height));
-            if self.is_bomb(x as f32, y as f32) {
+            if self.is_bomb(x as f32, y as f32)
+                || no_bomb_zone
+                    .as_ref()
+                    .is_some_and(|cell| cell.x == x as f32 && cell.y == y as f32)
+            {
                 continue;
             }
             self.bombs.push(Cell::new(x as f32, y as f32));
