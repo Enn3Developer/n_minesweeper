@@ -1,4 +1,3 @@
-mod resources;
 pub mod systems;
 
 use crate::AppState;
@@ -18,7 +17,6 @@ impl Plugin for End {
             )
                 .run_if(in_state(AppState::End)),
         )
-        .add_systems(OnEnter(AppState::End), init)
         .add_systems(OnExit(AppState::End), cleanup);
     }
 }

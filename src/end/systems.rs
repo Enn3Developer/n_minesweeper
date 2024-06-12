@@ -1,11 +1,9 @@
-use crate::end::resources::NTime;
-use crate::{AppState, EndState, NStopWatch};
+use crate::{AppState, EndState, NStopWatch, NTime};
 use bevy::prelude::*;
 use bevy_egui::egui::FontFamily::Proportional;
 use bevy_egui::egui::TextStyle::{Body, Heading, Monospace, Small};
 use bevy_egui::egui::{emath, FontId};
 use bevy_egui::{egui, EguiContexts};
-use std::time::Instant;
 
 pub fn show_results(
     end_state: Res<State<EndState>>,
@@ -46,10 +44,6 @@ pub fn return_to_menu(
 ) {
     app_state.set(AppState::MainMenu);
     end_state.set(EndState::NotEnded);
-}
-
-pub fn init(mut commands: Commands, stop_watch: ResMut<NStopWatch>) {
-    commands.insert_resource(NTime((Instant::now() - stop_watch.0).as_secs_f32() - 2.0));
 }
 
 pub fn cleanup(mut commands: Commands) {

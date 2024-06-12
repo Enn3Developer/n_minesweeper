@@ -1,7 +1,7 @@
 use crate::game::components::*;
 use crate::game::resources::{ChangeCells, ClearingCells, GameData, NTimer};
 use crate::game::*;
-use crate::{get_path, AppState, EndState, GameSettings, NStopWatch};
+use crate::{get_path, AppState, EndState, GameSettings, NStopWatch, NTime};
 use bevy::prelude::*;
 use bevy::window::RequestRedraw;
 use std::mem;
@@ -141,6 +141,8 @@ pub fn check_cell(
     game_settings: Res<GameSettings>,
     mut clearing_cells: ResMut<ClearingCells>,
     mut end_state: ResMut<NextState<EndState>>,
+    stop_watch: ResMut<NStopWatch>,
+    mut commands: Commands,
 ) {
     let window = windows.single();
     let (camera, transform) = cameras.single();
@@ -158,6 +160,7 @@ pub fn check_cell(
         if let Some((entity, cell, flag)) = center_cell {
             if grid.is_bomb_cell(&cell) && flag.is_none() {
                 end_state.set(EndState::Lose);
+                commands.insert_resource(NTime((Instant::now() - stop_watch.0).as_secs_f32()));
             }
             clearing_cells.cells.push_back((entity, cell));
         }

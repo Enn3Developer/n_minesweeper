@@ -91,6 +91,9 @@ pub enum EndState {
 }
 
 #[derive(Resource)]
+pub struct NTime(pub(crate) f32);
+
+#[derive(Resource)]
 pub struct NStopWatch(pub(crate) Instant);
 
 #[derive(Resource)]
