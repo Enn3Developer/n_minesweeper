@@ -15,6 +15,7 @@ bevy = { version = "0.13.2", default-features = false, features = [
     "bevy_render",
     "bevy_sprite",
     "default_font",
+    "multi-threaded",
     "png"
 ] }
 rand = "0.8.5"

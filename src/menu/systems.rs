@@ -34,6 +34,7 @@ pub fn draw_ui(
             (Small, FontId::new(10.0, Proportional)),
         ]
         .into();
+        style.spacing.slider_width = 250.0;
     });
 
     egui::TopBottomPanel::top("title").show(ctx, |ui| {
@@ -66,6 +67,7 @@ pub fn draw_ui(
                         .text("Height")
                         .ui(ui);
                     egui::Slider::new(&mut game_settings.bombs, 1..=100)
+                        .clamp_to_range(false)
                         .text("Bombs")
                         .ui(ui);
                     egui::Slider::new(&mut game_settings.speed, 1..=128)

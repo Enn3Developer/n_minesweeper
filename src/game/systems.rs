@@ -3,6 +3,8 @@ use crate::game::resources::{ChangeCells, ClearingCells, GameData, NTimer};
 use crate::game::*;
 use crate::{get_path, AppState, EndState, GameSettings, NStopWatch};
 use bevy::prelude::*;
+use std::mem;
+use std::sync::{mpsc, Arc, Mutex};
 
 type NotModified = (Without<Flag>, Without<Visible>);
 
@@ -22,7 +24,7 @@ pub fn tick_timer(
 
 pub fn show_bombs(mut commands: Commands, grid: Res<Grid>, mut cells: Query<(&mut Sprite, &Cell)>) {
     commands.insert_resource(NTimer(Timer::from_seconds(2.0, TimerMode::Once)));
-    cells.iter_mut().for_each(|(mut sprite, cell)| {
+    cells.par_iter_mut().for_each(|(mut sprite, cell)| {
         if grid.is_bomb_cell(cell) {
             sprite.color = Color::BLACK;
         }
@@ -32,15 +34,22 @@ pub fn show_bombs(mut commands: Commands, grid: Res<Grid>, mut cells: Query<(&mu
 pub fn change_all(
     mut change_cells: ResMut<ChangeCells>,
     mut cells: Query<(Entity, &mut Handle<Image>, &Cell)>,
-    mut commands: Commands,
+    commands: Commands,
     game_data: Res<GameData>,
 ) {
-    while let Some(cell) = change_cells.cells.pop() {
-        if let Some((entity, mut image, _)) = cells.iter_mut().find(|(_, _, c)| &&cell == c) {
+    let change_cells = mem::take(&mut change_cells.cells);
+    let commands = Arc::new(Mutex::new(commands));
+    cells.par_iter_mut().for_each(|(entity, mut image, cell)| {
+        if change_cells.contains(cell) {
             change_cell(image.as_mut(), game_data.open_cell());
-            commands.entity(entity).insert(Visible);
+            commands
+                .clone()
+                .lock()
+                .unwrap()
+                .entity(entity)
+                .insert(Visible);
         }
-    }
+    });
 }
 
 pub fn clear_cells(
@@ -56,6 +65,7 @@ pub fn clear_cells(
 ) {
     let mut popped = 0;
     let mut local_tried = vec![];
+    let (tx, rx) = mpsc::channel();
     while let Some((entity, cell)) = clearing_cells.cells.pop_front() {
         local_tried.push(cell.clone());
         if grid.is_bomb_cell(&cell)
@@ -80,18 +90,18 @@ pub fn clear_cells(
                 );
             }
         } else {
-            cells
-                .iter()
-                .filter(|(_, _, flag, visible)| flag.is_none() && visible.is_none())
-                .filter(|(_, c, _, _)| {
-                    cell.is_near(c)
-                        && !grid.is_bomb_cell(c)
-                        && &&cell != c
-                        && !local_tried.contains(c)
-                })
-                .for_each(|(entity, cell, _, _)| {
-                    clearing_cells.cells.push_back((entity, cell.clone()))
-                });
+            let tx = tx.clone();
+            cells.par_iter().for_each(|(entity, c, flag, visible)| {
+                if flag.is_none()
+                    && visible.is_none()
+                    && cell.is_near(c)
+                    && !grid.is_bomb_cell(c)
+                    && &cell != c
+                    && !local_tried.contains(c)
+                {
+                    tx.send((entity, c.clone())).expect("can't send cell data");
+                }
+            });
         }
         commands.entity(entity).insert(Tried);
         change_cells.cells.push(cell);
@@ -99,6 +109,10 @@ pub fn clear_cells(
         if popped == (game_settings.speed as f32 / (time.delta_seconds() * 16.0)) as u32 {
             break;
         }
+    }
+    drop(tx);
+    while let Ok(data) = rx.recv() {
+        clearing_cells.cells.push_back(data);
     }
 
     clearing_cells
