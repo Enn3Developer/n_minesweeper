@@ -3,6 +3,7 @@ use crate::game::resources::{ChangeCells, ClearingCells, GameData, NTimer};
 use crate::game::*;
 use crate::{get_path, AppState, EndState, GameSettings, NStopWatch};
 use bevy::prelude::*;
+use bevy::window::RequestRedraw;
 use std::mem;
 use std::sync::{mpsc, Arc, Mutex};
 
@@ -16,13 +17,21 @@ pub fn tick_timer(
     mut timer: ResMut<NTimer>,
     time: Res<Time>,
     mut app_state: ResMut<NextState<AppState>>,
+    mut redraw_event: EventWriter<RequestRedraw>,
 ) {
+    redraw_event.send(RequestRedraw);
     if timer.0.tick(time.delta()).finished() {
         app_state.set(AppState::End);
     }
 }
 
-pub fn show_bombs(mut commands: Commands, grid: Res<Grid>, mut cells: Query<(&mut Sprite, &Cell)>) {
+pub fn show_bombs(
+    mut commands: Commands,
+    grid: Res<Grid>,
+    mut cells: Query<(&mut Sprite, &Cell)>,
+    mut redraw_event: EventWriter<RequestRedraw>,
+) {
+    redraw_event.send(RequestRedraw);
     commands.insert_resource(NTimer(Timer::from_seconds(2.0, TimerMode::Once)));
     cells.par_iter_mut().for_each(|(mut sprite, cell)| {
         if grid.is_bomb_cell(cell) {
@@ -32,11 +41,15 @@ pub fn show_bombs(mut commands: Commands, grid: Res<Grid>, mut cells: Query<(&mu
 }
 
 pub fn change_all(
+    mut redraw_event: EventWriter<RequestRedraw>,
     mut change_cells: ResMut<ChangeCells>,
     mut cells: Query<(Entity, &mut Handle<Image>, &Cell)>,
     commands: Commands,
     game_data: Res<GameData>,
 ) {
+    if !change_cells.cells.is_empty() {
+        redraw_event.send(RequestRedraw);
+    }
     let change_cells = mem::take(&mut change_cells.cells);
     let commands = Arc::new(Mutex::new(commands));
     cells.par_iter_mut().for_each(|(entity, mut image, cell)| {
@@ -62,12 +75,14 @@ pub fn clear_cells(
     game_data: Res<GameData>,
     game_settings: Res<GameSettings>,
     time: Res<Time>,
+    mut redraw_event: EventWriter<RequestRedraw>,
 ) {
     let mut popped = 0;
     let mut local_tried = vec![];
     let (tx, rx) = mpsc::channel();
     while let Some((entity, cell)) = clearing_cells.cells.pop_front() {
         local_tried.push(cell.clone());
+        redraw_event.send(RequestRedraw);
         if grid.is_bomb_cell(&cell)
             || cells
                 .iter()
@@ -121,6 +136,7 @@ pub fn clear_cells(
 }
 
 pub fn check_cell(
+    mut redraw_event: EventWriter<RequestRedraw>,
     windows: Query<&Window>,
     cells: Query<(Entity, &Cell, Option<&Flag>)>,
     cameras: Query<(&Camera, &GlobalTransform)>,
@@ -135,6 +151,7 @@ pub fn check_cell(
         .cursor_position()
         .and_then(|cursor| camera.viewport_to_world_2d(transform, cursor))
     {
+        redraw_event.send(RequestRedraw);
         let clicked_cell = grid.global_to_grid(world_position.x, world_position.y);
         if grid.bombs().is_empty() {
             grid.generate(game_settings.bombs, Some(clicked_cell.clone()));
@@ -228,7 +245,9 @@ pub fn grid_setup(
     mut commands: Commands,
     server: Res<AssetServer>,
     game_settings: Res<GameSettings>,
+    mut redraw_event: EventWriter<RequestRedraw>,
 ) {
+    redraw_event.send(RequestRedraw);
     let grid_width = game_settings.width;
     let grid_height = game_settings.height;
     let cell_width = 30.0;

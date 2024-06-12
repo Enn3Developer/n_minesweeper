@@ -2,6 +2,7 @@ use crate::menu::{control_buttons, MenuState};
 use crate::{AppState, GameSettings};
 use bevy::app::AppExit;
 use bevy::prelude::*;
+use bevy::window::RequestRedraw;
 use bevy_egui::egui::FontFamily::Proportional;
 use bevy_egui::egui::TextStyle::{Body, Heading, Monospace, Small};
 use bevy_egui::egui::{emath, FontId, Widget};
@@ -115,4 +116,8 @@ pub fn cleanup(nodes: Query<Entity, With<Node>>, mut commands: Commands) {
     nodes
         .iter()
         .for_each(|node| commands.entity(node).despawn());
+}
+
+pub fn init(mut redraw_event: EventWriter<RequestRedraw>) {
+    redraw_event.send(RequestRedraw);
 }
