@@ -20,11 +20,19 @@ fn main() {
 
 pub fn run() {
     let mut app = App::new();
-    app.add_plugins(DefaultPlugins)
-        .insert_resource(WinitSettings::desktop_app())
-        .add_plugins(NMines)
-        .init_state::<AppState>()
-        .init_state::<EndState>();
+    app.add_plugins(DefaultPlugins.set(WindowPlugin {
+        primary_window: Some(Window {
+            // TODO: re-enable in Bevy 0.14
+            // fit_canvas_to_parent: true,
+            prevent_default_event_handling: false,
+            ..default()
+        }),
+        ..default()
+    }))
+    .insert_resource(WinitSettings::desktop_app())
+    .add_plugins(NMines)
+    .init_state::<AppState>()
+    .init_state::<EndState>();
     embedded_asset!(app, "../assets/fonts/NotoEmoji.ttf");
     embedded_asset!(app, "../assets/textures/closed.png");
     embedded_asset!(app, "../assets/textures/open.png");
