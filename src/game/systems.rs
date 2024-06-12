@@ -6,12 +6,9 @@ use bevy::prelude::*;
 use bevy::window::RequestRedraw;
 use std::mem;
 use std::sync::{mpsc, Arc, Mutex};
+use std::time::Instant;
 
 type NotModified = (Without<Flag>, Without<Visible>);
-
-pub fn update_time(time: Res<Time>, mut stop_watch: ResMut<NStopWatch>) {
-    stop_watch.0.tick(time.delta());
-}
 
 pub fn tick_timer(
     mut timer: ResMut<NTimer>,
@@ -262,7 +259,7 @@ pub fn grid_setup(
     commands.insert_resource(TextGrid::default());
     commands.insert_resource(ClearingCells::default());
     commands.insert_resource(ChangeCells::default());
-    commands.insert_resource(NStopWatch::default());
+    commands.insert_resource(NStopWatch(Instant::now()));
     let closed = server.load(get_path("textures/closed.png"));
     let mut cell_meshes = Vec::with_capacity((grid_width * grid_height) as usize);
 

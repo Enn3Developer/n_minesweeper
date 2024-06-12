@@ -8,7 +8,7 @@ use crate::menu::Menu;
 use bevy::app::PluginGroupBuilder;
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
-use bevy::time::Stopwatch;
+use std::time::Instant;
 
 pub struct NMines;
 
@@ -90,8 +90,8 @@ pub enum EndState {
     Lose,
 }
 
-#[derive(Resource, Default)]
-pub struct NStopWatch(pub(crate) Stopwatch);
+#[derive(Resource)]
+pub struct NStopWatch(pub(crate) Instant);
 
 #[derive(Resource)]
 pub struct GameSettings {

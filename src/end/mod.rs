@@ -1,3 +1,4 @@
+mod resources;
 pub mod systems;
 
 use crate::AppState;
@@ -16,6 +17,8 @@ impl Plugin for End {
                 return_to_menu.run_if(input_just_pressed(MouseButton::Left)),
             )
                 .run_if(in_state(AppState::End)),
-        );
+        )
+        .add_systems(OnEnter(AppState::End), init)
+        .add_systems(OnExit(AppState::End), cleanup);
     }
 }

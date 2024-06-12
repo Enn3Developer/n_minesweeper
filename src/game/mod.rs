@@ -20,7 +20,6 @@ impl Plugin for Game {
                 (
                     check_win,
                     clear_cells,
-                    update_time,
                     (
                         check_cell.run_if(input_just_pressed(MouseButton::Left)),
                         (add_flag, remove_flag)
