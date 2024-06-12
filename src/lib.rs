@@ -11,7 +11,7 @@ use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 use bevy::window::RequestRedraw;
 use bevy::winit::WinitSettings;
-use std::time::Instant;
+use web_time::Instant;
 
 #[bevy_main]
 fn main() {
@@ -24,6 +24,7 @@ pub fn run() {
         primary_window: Some(Window {
             // TODO: re-enable in Bevy 0.14
             // fit_canvas_to_parent: true,
+            canvas: Some("#bevy".to_owned()),
             prevent_default_event_handling: false,
             ..default()
         }),

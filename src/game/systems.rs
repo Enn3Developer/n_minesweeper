@@ -6,7 +6,7 @@ use bevy::prelude::*;
 use bevy::window::RequestRedraw;
 use std::mem;
 use std::sync::{mpsc, Arc, Mutex};
-use std::time::Instant;
+use web_time::Instant;
 
 type NotModified = (Without<Flag>, Without<Visible>);
 

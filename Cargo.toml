@@ -15,12 +15,14 @@ bevy = { version = "0.13.2", default-features = false, features = [
     "bevy_sprite",
     "default_font",
     "multi-threaded",
+    "webgl2",
     "png"
 ] }
 rand = "0.8.5"
 bevy_egui = { version = "0.27.1", default-features = false, features = ["open_url", "default_fonts", "render"] }
 bevy_ggrs = { version = "0.15.0", features = ["wasm-bindgen"] }
 bevy_matchbox = { version = "0.9", features = ["ggrs"] }
+web-time = "1.1.0"
 
 [profile.dev]
 debug = 0
