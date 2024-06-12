@@ -6,10 +6,30 @@ use crate::end::End;
 use crate::game::Game;
 use crate::menu::Menu;
 use bevy::app::PluginGroupBuilder;
+use bevy::asset::embedded_asset;
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 use bevy::window::RequestRedraw;
+use bevy::winit::WinitSettings;
 use std::time::Instant;
+
+#[bevy_main]
+fn main() {
+    run();
+}
+
+pub fn run() {
+    let mut app = App::new();
+    app.add_plugins(DefaultPlugins)
+        .insert_resource(WinitSettings::desktop_app())
+        .add_plugins(NMines)
+        .init_state::<AppState>()
+        .init_state::<EndState>();
+    embedded_asset!(app, "../assets/fonts/NotoEmoji.ttf");
+    embedded_asset!(app, "../assets/textures/closed.png");
+    embedded_asset!(app, "../assets/textures/open.png");
+    app.run();
+}
 
 pub struct NMines;
 
