@@ -34,6 +34,7 @@ pub fn run() {
     embedded_asset!(app, "../assets/fonts/NotoEmoji.ttf");
     embedded_asset!(app, "../assets/textures/closed.png");
     embedded_asset!(app, "../assets/textures/open.png");
+    embedded_asset!(app, "../assets/textures/atlas.png");
     app.run();
 }
 
