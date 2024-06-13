@@ -15,7 +15,7 @@ pub struct Game;
 
 impl Plugin for Game {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(AppState::Playing), grid_setup)
+        app.add_systems(OnEnter(AppState::Playing), (grid_setup, init))
             .add_systems(
                 Update,
                 (

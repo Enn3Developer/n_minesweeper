@@ -219,6 +219,18 @@ pub fn check_win(
     }
 }
 
+pub fn init(
+    game_settings: Res<GameSettings>,
+    mut q_transform: Query<&mut Transform, With<Camera>>,
+) {
+    let mut transform = q_transform.single_mut();
+    transform.translation = Vec3::new(
+        game_settings.width as f32 * 30.0 / 2.0,
+        game_settings.height as f32 * 30.0 / 2.0,
+        1000.0,
+    );
+}
+
 pub fn grid_setup(
     mut commands: Commands,
     server: Res<AssetServer>,
