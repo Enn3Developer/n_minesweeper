@@ -40,6 +40,13 @@ impl Plugin for Game {
     }
 }
 
+pub enum CellState {
+    Close,
+    Near(u32),
+    Flag,
+    Bomb,
+}
+
 pub fn get_bombs(
     cells: &Query<(Entity, &Cell, Option<&Flag>, Option<&Visible>), Without<Tried>>,
     checking_cell: &Cell,
@@ -57,17 +64,52 @@ pub fn change_cell_near_bomb(
     text_grid: &mut TextGrid,
     commands: &mut Commands,
     bomb_cells: u32,
-    style: TextStyle,
     cell: &Cell,
+    atlas: Handle<Image>,
 ) {
-    spawn_text(
+    spawn_sprite(
         commands,
-        style,
-        bomb_cells.to_string(),
         grid.grid_to_global(cell),
+        CellState::Near(bomb_cells),
+        atlas,
+        Color::BLACK,
     )
     .insert(GameComponent);
     text_grid.add(cell.clone());
+}
+
+pub fn spawn_sprite<'a>(
+    commands: &'a mut Commands,
+    pos: (f32, f32),
+    state: CellState,
+    atlas: Handle<Image>,
+    color: Color,
+) -> EntityCommands<'a> {
+    commands.spawn(SpriteBundle {
+        sprite: Sprite {
+            custom_size: Some(Vec2::new(30.0, 30.0)),
+            rect: Some(match state {
+                CellState::Close => {
+                    unreachable!()
+                }
+                CellState::Near(value) => Rect::from_corners(
+                    Vec2::new(0.0, 2048.0 + (1024 * (value - 1)) as f32),
+                    Vec2::new(1024.0, 2048.0 + (1024 * (value - 1)) as f32 + 1024.0),
+                ),
+                CellState::Flag => {
+                    Rect::from_corners(Vec2::new(0.0, 0.0), Vec2::new(1024.0, 1024.0))
+                }
+                CellState::Bomb => {
+                    Rect::from_corners(Vec2::new(0.0, 1024.0), Vec2::new(1024.0, 2048.0))
+                }
+            }),
+            color,
+            ..default()
+        },
+        texture: atlas,
+        transform: Transform::from_xyz(pos.0, pos.1, 0.0),
+        ..default()
+    })
 }
 
 pub fn spawn_text<'a>(
@@ -124,8 +166,8 @@ pub fn clear_all(
                 text_grid,
                 &mut commands,
                 bomb_cells,
-                game_data.normal_text(),
                 &cell,
+                game_data.atlas(),
             );
         }
     } else {

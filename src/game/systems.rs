@@ -19,13 +19,25 @@ pub fn tick_timer(
     }
 }
 
-pub fn show_bombs(mut commands: Commands, grid: Res<Grid>, mut cells: Query<(&mut Sprite, &Cell)>) {
+pub fn show_bombs(
+    mut commands: Commands,
+    grid: Res<Grid>,
+    cells: Query<&Cell>,
+    game_data: Res<GameData>,
+) {
     commands.insert_resource(NTimer(Timer::from_seconds(2.0, TimerMode::Once)));
-    cells.par_iter_mut().for_each(|(mut sprite, cell)| {
+    for cell in cells.iter() {
         if grid.is_bomb_cell(cell) {
-            sprite.color = Color::BLACK;
+            spawn_sprite(
+                &mut commands,
+                grid.grid_to_global(cell),
+                CellState::Bomb,
+                game_data.atlas(),
+                Color::WHITE,
+            )
+            .insert(GameComponent);
         }
-    });
+    }
 }
 
 pub fn change_all(
@@ -143,11 +155,12 @@ pub fn add_flag(
         let clicked_cell = grid.global_to_grid(world_position.x, world_position.y);
         if let Some((entity, cell)) = cells.iter().find(|(_, other)| &&clicked_cell == other) {
             commands.entity(entity).insert(Flag::default());
-            spawn_text(
+            spawn_sprite(
                 &mut commands,
-                game_data.flag_text(),
-                "🚩",
                 grid.grid_to_global(cell),
+                CellState::Flag,
+                game_data.atlas(),
+                Color::BLACK,
             )
             .insert(Flag {
                 cell: Some(cell.clone()),
@@ -161,7 +174,7 @@ pub fn remove_flag(
     windows: Query<&Window>,
     cameras: Query<(&Camera, &GlobalTransform)>,
     cells: Query<(Entity, &Cell), With<Flag>>,
-    flags: Query<(Entity, &Flag), With<Text>>,
+    flags: Query<(Entity, &Flag), Without<Cell>>,
     grid: Res<Grid>,
     mut commands: Commands,
 ) {

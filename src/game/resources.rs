@@ -111,6 +111,8 @@ impl GameData {
         self.images
             .push(server.load(get_path("textures/closed.png")));
         self.images.push(server.load(get_path("textures/open.png")));
+        self.images
+            .push(server.load(get_path("textures/atlas.png")));
         let style = TextStyle {
             color: Color::BLACK,
             font_size: 24.0,
@@ -131,6 +133,10 @@ impl GameData {
 
     pub fn open_cell(&self) -> Handle<Image> {
         self.images[1].clone()
+    }
+
+    pub fn atlas(&self) -> Handle<Image> {
+        self.images[2].clone()
     }
 
     pub fn normal_text(&self) -> TextStyle {
