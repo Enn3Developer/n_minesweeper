@@ -107,23 +107,7 @@ pub fn spawn_sprite<'a>(
             ..default()
         },
         texture: atlas,
-        transform: Transform::from_xyz(pos.0, pos.1, 0.0),
-        ..default()
-    })
-}
-
-pub fn spawn_text<'a>(
-    commands: &'a mut Commands,
-    style: TextStyle,
-    text: impl Into<String>,
-    pos: (f32, f32),
-) -> EntityCommands<'a> {
-    commands.spawn(Text2dBundle {
-        text: Text {
-            sections: vec![TextSection::new(text, style)],
-            ..default()
-        },
-        transform: Transform::from_xyz(pos.0, pos.1, 1.0),
+        transform: Transform::from_xyz(pos.0, pos.1, 10.0),
         ..default()
     })
 }

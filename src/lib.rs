@@ -29,9 +29,9 @@ pub fn run() {
         ..default()
     }))
     .add_plugins(NMines)
+    .insert_resource(Msaa::Off)
     .init_state::<AppState>()
     .init_state::<EndState>();
-    embedded_asset!(app, "../assets/fonts/NotoEmoji.ttf");
     embedded_asset!(app, "../assets/textures/closed.png");
     embedded_asset!(app, "../assets/textures/open.png");
     embedded_asset!(app, "../assets/textures/atlas.png");

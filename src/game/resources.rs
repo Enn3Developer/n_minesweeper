@@ -103,7 +103,6 @@ pub struct ChangeCells {
 #[derive(Resource, Default)]
 pub struct GameData {
     images: Vec<Handle<Image>>,
-    text_styles: Vec<TextStyle>,
 }
 
 impl GameData {
@@ -113,18 +112,6 @@ impl GameData {
         self.images.push(server.load(get_path("textures/open.png")));
         self.images
             .push(server.load(get_path("textures/atlas.png")));
-        let style = TextStyle {
-            color: Color::BLACK,
-            font_size: 24.0,
-            ..default()
-        };
-        self.text_styles.push(style);
-        let style = TextStyle {
-            color: Color::BLACK,
-            font_size: 24.0,
-            font: server.load(get_path("fonts/NotoEmoji.ttf")),
-        };
-        self.text_styles.push(style);
     }
 
     pub fn closed_cell(&self) -> Handle<Image> {
@@ -137,14 +124,6 @@ impl GameData {
 
     pub fn atlas(&self) -> Handle<Image> {
         self.images[2].clone()
-    }
-
-    pub fn normal_text(&self) -> TextStyle {
-        self.text_styles[0].clone()
-    }
-
-    pub fn flag_text(&self) -> TextStyle {
-        self.text_styles[1].clone()
     }
 }
 
