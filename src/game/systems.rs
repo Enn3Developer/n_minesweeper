@@ -26,18 +26,22 @@ pub fn show_bombs(
     game_data: Res<GameData>,
 ) {
     commands.insert_resource(NTimer(Timer::from_seconds(2.0, TimerMode::Once)));
+    let mut bombs = Vec::with_capacity(grid.bombs().len());
     for cell in cells.iter() {
         if grid.is_bomb_cell(cell) {
-            spawn_sprite(
-                &mut commands,
-                grid.grid_to_global(cell),
-                CellState::Bomb,
-                game_data.atlas(),
-                Color::WHITE,
-            )
-            .insert(GameComponent);
+            bombs.push((
+                prepare_spawn_sprite(
+                    grid.grid_to_global(cell),
+                    CellState::Bomb,
+                    game_data.atlas(),
+                    Color::WHITE,
+                ),
+                GameComponent,
+            ));
         }
     }
+
+    commands.spawn_batch(bombs);
 }
 
 pub fn change_all(
@@ -75,6 +79,7 @@ pub fn clear_cells(
     let mut popped = 0;
     let speed = (game_settings.speed as f32 * time.delta_seconds() * 1000.0) as u32;
     let mut local_tried = vec![];
+    let (tx_c, rx_c) = mpsc::channel();
     while popped < speed {
         if clearing_cells.cells.is_empty() {
             break;
@@ -90,6 +95,7 @@ pub fn clear_cells(
                 &mut commands,
                 &game_data,
                 tx.clone(),
+                tx_c.clone(),
                 entity,
                 &mut change_cells,
             ) {
@@ -106,6 +112,12 @@ pub fn clear_cells(
             .cells
             .retain(|(_, cell)| cells.iter().find(|(_, c, _, _)| &cell == c).is_some());
     }
+    let mut sprites = vec![];
+    while let Ok(sprite) = rx_c.try_recv() {
+        sprites.push(sprite);
+    }
+
+    commands.spawn_batch(sprites);
 }
 
 pub fn check_cell(

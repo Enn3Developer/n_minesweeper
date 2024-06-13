@@ -78,14 +78,13 @@ pub fn change_cell_near_bomb(
     text_grid.add(cell.clone());
 }
 
-pub fn spawn_sprite<'a>(
-    commands: &'a mut Commands,
+pub fn prepare_spawn_sprite(
     pos: (f32, f32),
     state: CellState,
     atlas: Handle<Image>,
     color: Color,
-) -> EntityCommands<'a> {
-    commands.spawn(SpriteBundle {
+) -> SpriteBundle {
+    SpriteBundle {
         sprite: Sprite {
             custom_size: Some(Vec2::new(30.0, 30.0)),
             rect: Some(match state {
@@ -109,7 +108,17 @@ pub fn spawn_sprite<'a>(
         texture: atlas,
         transform: Transform::from_xyz(pos.0, pos.1, 10.0),
         ..default()
-    })
+    }
+}
+
+pub fn spawn_sprite<'a>(
+    commands: &'a mut Commands,
+    pos: (f32, f32),
+    state: CellState,
+    atlas: Handle<Image>,
+    color: Color,
+) -> EntityCommands<'a> {
+    commands.spawn(prepare_spawn_sprite(pos, state, atlas, color))
 }
 
 pub fn change_color(commands: &mut Commands, entity: Entity, color: Handle<ColorMaterial>) {
@@ -126,9 +135,10 @@ pub fn clear_all(
     grid: &Grid,
     cells: &Query<(Entity, &Cell, Option<&Flag>, Option<&Visible>), Without<Tried>>,
     text_grid: &mut TextGrid,
-    mut commands: &mut Commands,
+    commands: &mut Commands,
     game_data: &GameData,
     tx: Sender<(Entity, Cell)>,
+    tx_commands: Sender<(SpriteBundle, GameComponent)>,
     entity: Entity,
     change_cells: &mut ChangeCells,
 ) -> bool {
@@ -145,14 +155,18 @@ pub fn clear_all(
     let bomb_cells = get_bombs(&cells, &cell, &grid);
     if bomb_cells > 0 {
         if !text_grid.contains(&cell) {
-            change_cell_near_bomb(
-                &grid,
-                text_grid,
-                &mut commands,
-                bomb_cells,
-                &cell,
-                game_data.atlas(),
-            );
+            tx_commands
+                .send((
+                    prepare_spawn_sprite(
+                        grid.grid_to_global(&cell),
+                        CellState::Near(bomb_cells),
+                        game_data.atlas(),
+                        Color::BLACK,
+                    ),
+                    GameComponent,
+                ))
+                .expect("can't send sprite data");
+            text_grid.add(cell.clone());
         }
     } else {
         let tx = tx.clone();
