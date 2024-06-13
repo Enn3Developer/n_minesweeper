@@ -14,7 +14,6 @@ impl Plugin for Menu {
         app.add_plugins(EguiPlugin)
             .insert_resource(GameSettings::default())
             .init_state::<MenuState>()
-            .add_systems(OnEnter(AppState::MainMenu), init)
             .add_systems(OnExit(AppState::MainMenu), cleanup)
             .add_systems(Update, draw_ui.run_if(in_state(AppState::MainMenu)));
     }

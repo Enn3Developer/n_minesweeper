@@ -9,7 +9,6 @@ use bevy::app::PluginGroupBuilder;
 use bevy::asset::embedded_asset;
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
-use bevy::window::RequestRedraw;
 use web_time::Instant;
 
 #[bevy_main]
@@ -67,12 +66,11 @@ pub fn init(mut windows: Query<&mut Window>) {
     window.title = String::from("N Mines");
 }
 
-pub fn setup(mut commands: Commands, mut redraw_event: EventWriter<RequestRedraw>) {
+pub fn setup(mut commands: Commands) {
     let mut camera = Camera2dBundle::default();
     camera.transform.translation = Vec3::new(600.0 / 2.0, 600.0 / 2.0, 1000.0);
     camera.projection.scaling_mode = ScalingMode::WindowSize(1.0);
     commands.spawn(camera);
-    redraw_event.send(RequestRedraw);
 }
 
 pub fn move_camera(
