@@ -141,7 +141,7 @@ impl Default for GameSettings {
             width: 20,
             height: 20,
             bombs: 40,
-            speed: 4,
+            speed: 2,
         }
     }
 }
