@@ -3,11 +3,12 @@ pub mod resources;
 pub mod systems;
 
 use crate::game::components::*;
-use crate::game::resources::{Grid, TextGrid};
+use crate::game::resources::{ChangeCells, GameData, Grid, TextGrid};
 use crate::{AppState, EndState};
 use bevy::ecs::system::EntityCommands;
 use bevy::input::common_conditions::input_just_pressed;
 use bevy::prelude::*;
+use std::sync::mpsc::Sender;
 use systems::*;
 
 pub struct Game;
@@ -91,4 +92,57 @@ pub fn change_color(commands: &mut Commands, entity: Entity, color: Handle<Color
 
 pub fn change_cell(cell_image: &mut Handle<Image>, image: Handle<Image>) {
     *cell_image = image;
+}
+
+pub fn clear_all(
+    local_tried: &mut Vec<Cell>,
+    cell: Cell,
+    grid: &Grid,
+    cells: &Query<(Entity, &Cell, Option<&Flag>, Option<&Visible>), Without<Tried>>,
+    text_grid: &mut TextGrid,
+    mut commands: &mut Commands,
+    game_data: &GameData,
+    tx: Sender<(Entity, Cell)>,
+    entity: Entity,
+    change_cells: &mut ChangeCells,
+) -> bool {
+    local_tried.push(cell.clone());
+    if grid.is_bomb_cell(&cell)
+        || cells
+            .iter()
+            .find(|d| d.1 == &cell)
+            .is_some_and(|d| d.2.is_some())
+    {
+        return false;
+    }
+
+    let bomb_cells = get_bombs(&cells, &cell, &grid);
+    if bomb_cells > 0 {
+        if !text_grid.contains(&cell) {
+            change_cell_near_bomb(
+                &grid,
+                text_grid,
+                &mut commands,
+                bomb_cells,
+                game_data.normal_text(),
+                &cell,
+            );
+        }
+    } else {
+        let tx = tx.clone();
+        cells.par_iter().for_each(|(entity, c, flag, visible)| {
+            if flag.is_none()
+                && visible.is_none()
+                && cell.is_near(c)
+                && !grid.is_bomb_cell(c)
+                && &cell != c
+                && !local_tried.contains(c)
+            {
+                tx.send((entity, c.clone())).expect("can't send cell data");
+            }
+        });
+    }
+    commands.entity(entity).insert(Tried);
+    change_cells.cells.push(cell);
+    true
 }

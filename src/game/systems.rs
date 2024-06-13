@@ -75,61 +75,43 @@ pub fn clear_cells(
     mut redraw_event: EventWriter<RequestRedraw>,
 ) {
     let mut popped = 0;
+    let speed = (game_settings.speed as f32 * time.delta_seconds() * 1000.0) as u32;
     let mut local_tried = vec![];
-    let (tx, rx) = mpsc::channel();
-    while let Some((entity, cell)) = clearing_cells.cells.pop_front() {
-        local_tried.push(cell.clone());
+    if !clearing_cells.cells.is_empty() {
         redraw_event.send(RequestRedraw);
-        if grid.is_bomb_cell(&cell)
-            || cells
-                .iter()
-                .find(|d| d.1 == &cell)
-                .is_some_and(|d| d.2.is_some())
-        {
-            continue;
-        }
-
-        let bomb_cells = get_bombs(&cells, &cell, &grid);
-        if bomb_cells > 0 {
-            if !text_grid.contains(&cell) {
-                change_cell_near_bomb(
-                    &grid,
-                    &mut text_grid,
-                    &mut commands,
-                    bomb_cells,
-                    game_data.normal_text(),
-                    &cell,
-                );
-            }
-        } else {
-            let tx = tx.clone();
-            cells.par_iter().for_each(|(entity, c, flag, visible)| {
-                if flag.is_none()
-                    && visible.is_none()
-                    && cell.is_near(c)
-                    && !grid.is_bomb_cell(c)
-                    && &cell != c
-                    && !local_tried.contains(c)
-                {
-                    tx.send((entity, c.clone())).expect("can't send cell data");
-                }
-            });
-        }
-        commands.entity(entity).insert(Tried);
-        change_cells.cells.push(cell);
-        popped += 1;
-        if popped == (game_settings.speed as f32 / (time.delta_seconds() * 16.0)) as u32 {
+    }
+    while popped < speed {
+        if clearing_cells.cells.is_empty() {
             break;
         }
+        let (tx, rx) = mpsc::channel();
+        while let Some((entity, cell)) = clearing_cells.cells.pop_front() {
+            if clear_all(
+                &mut local_tried,
+                cell,
+                &grid,
+                &cells,
+                &mut text_grid,
+                &mut commands,
+                &game_data,
+                tx.clone(),
+                entity,
+                &mut change_cells,
+            ) {
+                popped += 1;
+                if popped == speed {
+                    break;
+                }
+            }
+        }
+        drop(tx);
+        while let Ok(data) = rx.try_recv() {
+            clearing_cells.cells.push_back(data);
+        }
+        clearing_cells
+            .cells
+            .retain(|(_, cell)| cells.iter().find(|(_, c, _, _)| &cell == c).is_some());
     }
-    drop(tx);
-    while let Ok(data) = rx.recv() {
-        clearing_cells.cells.push_back(data);
-    }
-
-    clearing_cells
-        .cells
-        .retain(|(_, cell)| cells.iter().find(|(_, c, _, _)| &cell == c).is_some());
 }
 
 pub fn check_cell(
