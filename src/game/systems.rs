@@ -104,7 +104,6 @@ pub fn clear_cells(
                 }
             }
         }
-        drop(tx);
         while let Ok(data) = rx.try_recv() {
             clearing_cells.cells.push_back(data);
         }
