@@ -141,8 +141,6 @@ pub fn check_cell(
     game_settings: Res<GameSettings>,
     mut clearing_cells: ResMut<ClearingCells>,
     mut end_state: ResMut<NextState<EndState>>,
-    stop_watch: ResMut<NStopWatch>,
-    mut commands: Commands,
 ) {
     let window = windows.single();
     let (camera, transform) = cameras.single();
@@ -160,7 +158,6 @@ pub fn check_cell(
         if let Some((entity, cell, flag)) = center_cell {
             if grid.is_bomb_cell(&cell) && flag.is_none() {
                 end_state.set(EndState::Lose);
-                commands.insert_resource(NTime((Instant::now() - stop_watch.0).as_secs_f32()));
             }
             clearing_cells.cells.push_back((entity, cell));
         }
@@ -291,7 +288,11 @@ pub fn grid_setup(
     commands.spawn_batch(cell_meshes);
 }
 
-pub fn cleanup(entities: Query<Entity, With<GameComponent>>, mut commands: Commands) {
+pub fn cleanup(
+    entities: Query<Entity, With<GameComponent>>,
+    mut commands: Commands,
+    stop_watch: ResMut<NStopWatch>,
+) {
     entities
         .iter()
         .for_each(|entity| commands.entity(entity).despawn());
@@ -301,4 +302,5 @@ pub fn cleanup(entities: Query<Entity, With<GameComponent>>, mut commands: Comma
     commands.remove_resource::<ChangeCells>();
     commands.remove_resource::<GameData>();
     commands.remove_resource::<NTimer>();
+    commands.insert_resource(NTime((Instant::now() - stop_watch.0).as_secs_f32()));
 }
