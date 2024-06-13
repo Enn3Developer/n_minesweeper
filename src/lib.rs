@@ -10,7 +10,6 @@ use bevy::asset::embedded_asset;
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 use bevy::window::RequestRedraw;
-use bevy::winit::WinitSettings;
 use web_time::Instant;
 
 #[bevy_main]
@@ -30,7 +29,6 @@ pub fn run() {
         }),
         ..default()
     }))
-    .insert_resource(WinitSettings::desktop_app())
     .add_plugins(NMines)
     .init_state::<AppState>()
     .init_state::<EndState>();
