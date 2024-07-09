@@ -47,7 +47,7 @@ pub fn control_buttons(
             next_state.set(MenuState::Multiplayer);
         }
         if ui.button("Exit").clicked() {
-            app_exit_events.send(AppExit);
+            app_exit_events.send(AppExit::Success);
         }
     });
 }

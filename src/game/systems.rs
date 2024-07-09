@@ -52,7 +52,7 @@ pub fn change_all(
 ) {
     let change_cells = mem::take(&mut change_cells.cells);
     let commands = Arc::new(Mutex::new(commands));
-    cells.par_iter_mut().for_each(|(entity, mut image, cell)| {
+    cells.iter_mut().for_each(|(entity, mut image, cell)| {
         if change_cells.contains(cell) {
             change_cell(image.as_mut(), game_data.open_cell());
             commands
