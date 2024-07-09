@@ -20,8 +20,7 @@ pub fn run() {
     let mut app = App::new();
     app.add_plugins(DefaultPlugins.set(WindowPlugin {
         primary_window: Some(Window {
-            // TODO: re-enable in Bevy 0.14
-            // fit_canvas_to_parent: true,
+            fit_canvas_to_parent: true,
             canvas: Some("#bevy".to_owned()),
             prevent_default_event_handling: false,
             ..default()
