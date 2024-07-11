@@ -4,8 +4,8 @@ use crate::menu::systems::*;
 use crate::{AppState, GameSettings};
 use bevy::app::AppExit;
 use bevy::prelude::*;
-use bevy_egui::egui::{emath, Ui};
-use bevy_egui::EguiPlugin;
+use bevy_egui::egui::{emath, Response, Ui, Widget, WidgetText};
+use bevy_egui::{egui, EguiPlugin};
 
 pub struct Menu;
 
@@ -37,21 +37,27 @@ pub fn control_buttons(
 ) {
     ui.vertical_centered(|ui| {
         ui.allocate_space(emath::Vec2::new(1.0, 100.0));
-        if ui.button("Play").clicked() {
+        if button(ui, "Play").clicked() {
             app_state.set(AppState::Playing);
             next_state.set(MenuState::None);
         }
-        if ui.button("Customize").clicked() {
+        if button(ui, "Customize").clicked() {
             next_state.set(MenuState::Customizing);
         }
-        if ui.button("Settings").clicked() {
+        if button(ui, "Settings").clicked() {
             next_state.set(MenuState::Settings);
         }
-        if ui.button("Multiplayer").clicked() {
+        if button(ui, "Multiplayer").clicked() {
             next_state.set(MenuState::Multiplayer);
         }
-        if ui.button("Exit").clicked() {
+        if button(ui, "Exit").clicked() {
             app_exit_events.send(AppExit::Success);
         }
     });
+}
+
+pub fn button(ui: &mut Ui, text: impl Into<WidgetText>) -> Response {
+    egui::Button::new(text)
+        .min_size(egui::Vec2::new(150.0, 25.0))
+        .ui(ui)
 }

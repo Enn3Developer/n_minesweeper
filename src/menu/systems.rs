@@ -1,4 +1,4 @@
-use crate::menu::{control_buttons, MenuState};
+use crate::menu::{button, control_buttons, MenuState};
 use crate::settings::Settings;
 use crate::{AppState, GameSettings};
 use bevy::app::AppExit;
@@ -105,8 +105,8 @@ pub fn draw_ui(
             egui::CentralPanel::default().show(ctx, |ui| {
                 ui.vertical_centered(|ui| {
                     ui.allocate_space(emath::Vec2::new(1.0, 100.0));
-                    if ui.button("Create").clicked() {}
-                    if ui.button("Join").clicked() {
+                    if button(ui, "Create").clicked() {}
+                    if button(ui, "Join").clicked() {
                         next_state.set(MenuState::MultiplayerJoin);
                     }
                 });
@@ -122,7 +122,7 @@ pub fn draw_ui(
                 ui.vertical_centered(|ui| {
                     ui.allocate_space(emath::Vec2::new(1.0, 100.0));
                     ui.label("Write ID");
-                    if ui.button("Join").clicked() {}
+                    if button(ui, "Join").clicked() {}
                 });
             });
         }
