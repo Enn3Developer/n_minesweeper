@@ -1,6 +1,7 @@
 pub mod end;
 pub mod game;
 pub mod menu;
+pub mod settings;
 
 use crate::end::End;
 use crate::game::Game;
@@ -9,6 +10,7 @@ use bevy::app::PluginGroupBuilder;
 use bevy::asset::embedded_asset;
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
+use bevy_pkv::PkvStore;
 use web_time::Instant;
 
 #[bevy_main]
@@ -29,8 +31,11 @@ pub fn run() {
     }))
     .add_plugins(NMines)
     .insert_resource(Msaa::Off)
+    .insert_resource(PkvStore::new("N Inc.", "N Mines"))
     .init_state::<AppState>()
-    .init_state::<EndState>();
+    .init_state::<EndState>()
+    .add_systems(Startup, settings::setup)
+    .add_systems(Last, settings::save);
     embedded_asset!(app, "../assets/textures/closed.png");
     embedded_asset!(app, "../assets/textures/open.png");
     embedded_asset!(app, "../assets/textures/atlas.png");

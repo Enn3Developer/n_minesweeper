@@ -1,4 +1,5 @@
 use crate::menu::{control_buttons, MenuState};
+use crate::settings::Settings;
 use crate::{AppState, GameSettings};
 use bevy::app::AppExit;
 use bevy::prelude::*;
@@ -23,6 +24,7 @@ pub fn draw_ui(
     current_state: Res<State<MenuState>>,
     mut next_state: ResMut<NextState<MenuState>>,
     mut game_settings: ResMut<GameSettings>,
+    mut settings: ResMut<Settings>,
 ) {
     let ctx = ctx.ctx_mut();
     ctx.style_mut(|style| {
@@ -75,6 +77,22 @@ pub fn draw_ui(
                     egui::Slider::new(&mut game_settings.speed, 1..=128)
                         .text("Speed")
                         .ui(ui);
+                });
+            });
+        }
+        MenuState::Settings => {
+            egui::SidePanel::left("left")
+                .resizable(false)
+                .show(ctx, |ui| {
+                    control_buttons(ui, &mut app_state, &mut next_state, &mut app_exit_events);
+                });
+            egui::CentralPanel::default().show(ctx, |ui| {
+                ui.vertical_centered(|ui| {
+                    ui.allocate_space(emath::Vec2::new(1.0, 100.0));
+                    ui.horizontal(|ui| {
+                        ui.label("Name");
+                        ui.text_edit_singleline(&mut settings.name);
+                    });
                 });
             });
         }

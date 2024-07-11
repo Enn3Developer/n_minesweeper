@@ -24,6 +24,7 @@ pub enum MenuState {
     #[default]
     None,
     Customizing,
+    Settings,
     Multiplayer,
     MultiplayerJoin,
 }
@@ -42,6 +43,9 @@ pub fn control_buttons(
         }
         if ui.button("Customize").clicked() {
             next_state.set(MenuState::Customizing);
+        }
+        if ui.button("Settings").clicked() {
+            next_state.set(MenuState::Settings);
         }
         if ui.button("Multiplayer").clicked() {
             next_state.set(MenuState::Multiplayer);
