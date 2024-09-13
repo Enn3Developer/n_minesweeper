@@ -50,6 +50,7 @@ pub fn control_buttons(
         if button(ui, "Multiplayer").clicked() {
             next_state.set(MenuState::Multiplayer);
         }
+        #[cfg(not(target_arch = "wasm32"))]
         if button(ui, "Exit").clicked() {
             app_exit_events.send(AppExit::Success);
         }
