@@ -63,15 +63,18 @@ pub fn draw_ui(
                 });
             egui::CentralPanel::default().show(ctx, |ui| {
                 ui.vertical_centered(|ui| {
+                    let width = game_settings.width;
+                    let height = game_settings.height;
                     ui.allocate_space(emath::Vec2::new(1.0, 100.0));
-                    egui::Slider::new(&mut game_settings.width, 1..=100)
+                    egui::Slider::new(&mut game_settings.width, 2..=100)
+                        .clamp_to_range(false)
                         .text("Width")
                         .ui(ui);
-                    egui::Slider::new(&mut game_settings.height, 1..=100)
+                    egui::Slider::new(&mut game_settings.height, 2..=100)
+                        .clamp_to_range(false)
                         .text("Height")
                         .ui(ui);
-                    egui::Slider::new(&mut game_settings.bombs, 1..=100)
-                        .clamp_to_range(false)
+                    egui::Slider::new(&mut game_settings.bombs, 1..=(width * height - 1))
                         .text("Bombs")
                         .ui(ui);
                     egui::Slider::new(&mut game_settings.speed, 1..=128)
