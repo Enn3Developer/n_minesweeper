@@ -66,12 +66,12 @@ pub fn draw_ui(
                     let width = game_settings.width;
                     let height = game_settings.height;
                     ui.allocate_space(emath::Vec2::new(1.0, 100.0));
-                    egui::Slider::new(&mut game_settings.width, 2..=100)
-                        .clamp_to_range(false)
+                    egui::Slider::new(&mut game_settings.width, 2..=200)
+                        .logarithmic(true)
                         .text("Width")
                         .ui(ui);
-                    egui::Slider::new(&mut game_settings.height, 2..=100)
-                        .clamp_to_range(false)
+                    egui::Slider::new(&mut game_settings.height, 2..=200)
+                        .logarithmic(true)
                         .text("Height")
                         .ui(ui);
                     egui::Slider::new(&mut game_settings.bombs, 1..=(width * height - 1))
