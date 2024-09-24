@@ -12,6 +12,9 @@ func _ready() -> void:
 	$Settings.visible = false
 	if OS.has_feature("web") or OS.has_feature("mobile"):
 		$Buttons/Exit.visible = false
+	$Settings/Height/HeightSlider.value = GameSettings.height
+	$Settings/Width/WidthSlider.value = GameSettings.width
+	bombs_slider.value = GameSettings.bombs
 
 func _on_play_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/game.tscn")
