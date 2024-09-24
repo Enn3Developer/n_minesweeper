@@ -1,19 +1,19 @@
 [gd_scene load_steps=10 format=3 uid="uid://bvque3bnhe0cl"]
 
-[ext_resource type="Script" path="res://scripts/Game.cs" id="1_nju4x"]
+[ext_resource type="Script" path="res://scripts/game.gd" id="1_7mrtt"]
 [ext_resource type="Shader" path="res://shaders/cell.gdshader" id="2_ck013"]
 [ext_resource type="Texture2D" uid="uid://cdtxeu622uyd6" path="res://assets/textures/atlas.png" id="2_fpn3v"]
 [ext_resource type="Script" path="res://scripts/camera.gd" id="4_pe86x"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_5umxt"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_oihxx"]
 render_priority = 0
 shader = ExtResource("2_ck013")
 shader_parameter/albedo = Color(1, 1, 1, 1)
-shader_parameter/texture_albedo = ExtResource("2_fpn3v")
 shader_parameter/uv1_scale = Vector3(1, 1, 1)
+shader_parameter/texture_albedo = ExtResource("2_fpn3v")
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_pffit"]
-material = SubResource("ShaderMaterial_5umxt")
+[sub_resource type="PlaneMesh" id="PlaneMesh_6ympk"]
+material = SubResource("ShaderMaterial_oihxx")
 size = Vector2(1, 1)
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_wiwnl"]
@@ -28,11 +28,11 @@ sky_material = SubResource("ProceduralSkyMaterial_wiwnl")
 background_mode = 2
 sky = SubResource("Sky_3n807")
 
-[node name="Game" type="Node3D" node_paths=PackedStringArray("Camera")]
-script = ExtResource("1_nju4x")
-CellMesh = SubResource("PlaneMesh_pffit")
-Camera = NodePath("Camera3D")
-ScenePath = "res://scenes/end.tscn"
+[node name="Game" type="Node3D" node_paths=PackedStringArray("camera")]
+script = ExtResource("1_7mrtt")
+cell_mesh = SubResource("PlaneMesh_6ympk")
+camera = NodePath("Camera3D")
+scene_path = "res://scenes/end.tscn"
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)

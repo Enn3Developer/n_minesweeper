@@ -10,6 +10,8 @@ func _ready() -> void:
 	$TitleBar/Version.text = "v" + ProjectSettings.get("application/config/version")
 	$Buttons.visible = true
 	$Settings.visible = false
+	if OS.has_feature("web") or OS.has_feature("mobile"):
+		$Buttons/Exit.visible = false
 
 func _on_play_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/game.tscn")
