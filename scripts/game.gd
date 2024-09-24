@@ -17,6 +17,7 @@ var generated := false
 var start := 0
 
 func _ready() -> void:
+	GameSettings.emulate_mouse = false
 	height = GameSettings.height
 	width = GameSettings.width
 	bombs = GameSettings.bombs
@@ -48,6 +49,7 @@ func _ready() -> void:
 func _exit_tree() -> void:
 	RenderingServer.free_rid(instance)
 	RenderingServer.free_rid(multimesh)
+	GameSettings.emulate_mouse = true
 
 func _process(delta: float) -> void:
 	if generated: check_win()
@@ -56,17 +58,46 @@ func _area_on_input_event(camera: Node, event: InputEvent, event_position: Vecto
 	if event is InputEventMouseButton:
 		if event.pressed:
 			var position := Vector2i(floorf(event_position.x), floorf(event_position.z))
-			var index := position.y * width + position.x
 			if event.button_index == MOUSE_BUTTON_LEFT:
-				if not generated:
-					generate_grid(position)
-				if grid.decode_s8(index) == -1:
-					prepare_lose()
-					return
-				show_cell_and_neighbours(position)
+				click_show(position)
 			elif event.button_index == MOUSE_BUTTON_RIGHT:
-				if showed_grid.decode_s8(index) == 1: return
-				flag_cell(position)
+				click_flag(position)
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventSingleScreenTap:
+		var touch_event: InputEventSingleScreenTap = event
+		var mouse_event := InputEventMouseButton.new()
+		mouse_event.pressed = true
+		mouse_event.button_index = MOUSE_BUTTON_LEFT
+		mouse_event.position = touch_event.position
+		Input.parse_input_event(mouse_event)
+		var new_event := mouse_event.duplicate(true)
+		new_event.pressed = false
+		Input.parse_input_event(new_event)
+	elif event is InputEventSingleScreenLongPress:
+		var touch_event: InputEventSingleScreenLongPress = event
+		var mouse_event := InputEventMouseButton.new()
+		mouse_event.pressed = true
+		mouse_event.button_index = MOUSE_BUTTON_RIGHT
+		mouse_event.position = touch_event.position
+		Input.parse_input_event(mouse_event)
+		var new_event := mouse_event.duplicate(true)
+		new_event.pressed = false
+		Input.parse_input_event(new_event)
+
+func click_show(position: Vector2i):
+	var index := position.y * width + position.x
+	if not generated:
+		generate_grid(position)
+	if grid.decode_s8(index) == -1:
+		prepare_lose()
+		return
+	show_cell_and_neighbours(position)
+
+func click_flag(position: Vector2i):
+	var index := position.y * width + position.x
+	if showed_grid.decode_s8(index) == 1: return
+	flag_cell(position)
 
 func generate_grid(click_position: Vector2i):
 	grid = PackedByteArray()

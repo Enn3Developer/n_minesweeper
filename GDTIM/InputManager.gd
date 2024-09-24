@@ -9,7 +9,7 @@ extends Node
 
 const DEFAULT_BINDIGS : bool = true
 
-const DEBUG : bool = false 
+const DEBUG : bool = false
 
 const DRAG_STARTUP_TIME : float = 0.02
 
@@ -17,7 +17,7 @@ const FINGER_SIZE : float = 100.0
 
 const MULTI_FINGER_RELEASE_THRESHOLD : float = 0.1
 
-const TAP_TIME_LIMIT     : float = 0.2
+const TAP_TIME_LIMIT     : float = 0.15
 const TAP_DISTANCE_LIMIT : float = 25.0
 
 const LONG_PRESS_TIME_THRESHOLD : float = 0.75
@@ -286,7 +286,6 @@ func _emit(sig : String, val : InputEvent) -> void:
 	emit_signal("any_gesture", sig, val)
 	emit_signal(sig, val)
 	Input.parse_input_event(val)
-
 
 # Disables drag and stops the drag enabling timer
 func _cancel_single_drag() -> void:

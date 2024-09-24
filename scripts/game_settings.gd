@@ -18,3 +18,28 @@ var bombs := 40:
 
 var timer := 0
 var win := false
+
+var emulate_mouse := true
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventScreenTouch and emulate_mouse:
+		var touch_event: InputEventScreenTouch = event
+		var mouse_event := InputEventMouseButton.new()
+		mouse_event.window_id = touch_event.window_id
+		mouse_event.position = touch_event.position
+		mouse_event.pressed = touch_event.pressed
+		mouse_event.button_index = MOUSE_BUTTON_LEFT
+		Input.parse_input_event(mouse_event)
+	elif event is InputEventScreenDrag and emulate_mouse:
+		var drag_event: InputEventScreenDrag = event
+		var mouse_event := InputEventMouseMotion.new()
+		mouse_event.pressure = drag_event.pressure
+		mouse_event.relative = drag_event.relative
+		mouse_event.pen_inverted = drag_event.pen_inverted
+		mouse_event.screen_relative = drag_event.screen_relative
+		mouse_event.screen_velocity = drag_event.screen_velocity
+		mouse_event.tilt = drag_event.tilt
+		mouse_event.velocity = drag_event.velocity
+		mouse_event.position = drag_event.position
+		mouse_event.window_id = drag_event.window_id
+		Input.parse_input_event(mouse_event)
