@@ -77,7 +77,7 @@ public partial class Game : Node3D
                 }
                 if (_grid[position.X, position.Y] == -1)
                 {
-                    EndGame(false);
+                    PrepareLose();
                     return;
                 }
                 ShowCellAndNeighbours(position);
@@ -105,6 +105,29 @@ public partial class Game : Node3D
     public override void _Process(double delta)
     {
         if (_generated) CheckWin();
+    }
+
+    private void PrepareLose()
+    {
+        var end = Time.GetTicksMsec();
+        var timer = new Timer();
+        timer.WaitTime = 2.0;
+        timer.Autostart = true;
+        timer.OneShot = true;
+        timer.Timeout += () =>
+        {
+            EndGame(false, end);
+        };
+
+        for (var x = 0; x < _width; x++)
+        {
+            for (var y = 0; y < _height; y++)
+            {
+                if (_grid[x, y] != -1) continue;
+                ShowCell(new Vector2I(x, y));
+            }
+        }
+        AddChild(timer);
     }
 
     private void GenerateGrid(Vector2I clickPosition)
@@ -224,9 +247,9 @@ public partial class Game : Node3D
         EndGame(true);
     }
 
-    private void EndGame(bool win)
+    private void EndGame(bool win, ulong end = 0)
     {
-        var end = Time.GetTicksMsec();
+        if (end == 0) end = Time.GetTicksMsec();
         var gameSettings = GetNode("/root/GameSettings");
         gameSettings.Set("win", win);
         gameSettings.Set("timer", end - _start);
