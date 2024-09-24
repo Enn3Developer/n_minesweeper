@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+InputManager="*res://GDTIM/InputManager.gd"
 GameSettings="*res://scripts/game_settings.gd"
 
 [debug]
