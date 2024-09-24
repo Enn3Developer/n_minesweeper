@@ -1,0 +1,169 @@
+[gd_scene load_steps=6 format=3 uid="uid://dcwvbecb6eimq"]
+
+[ext_resource type="Script" path="res://scripts/menu.gd" id="1_6wwdr"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_4qkd1"]
+font_size = 64
+
+[sub_resource type="LabelSettings" id="LabelSettings_g72v7"]
+font_size = 20
+
+[sub_resource type="Theme" id="Theme_o0d0t"]
+default_font_size = 32
+
+[sub_resource type="Theme" id="Theme_tvttq"]
+default_font_size = 32
+
+[node name="Menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6wwdr")
+
+[node name="TitleBar" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -126.0
+offset_right = 126.0
+offset_bottom = 120.0
+grow_horizontal = 2
+
+[node name="Title" type="Label" parent="TitleBar"]
+layout_mode = 2
+text = "N Mines"
+label_settings = SubResource("LabelSettings_4qkd1")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Version" type="Label" parent="TitleBar"]
+layout_mode = 2
+label_settings = SubResource("LabelSettings_g72v7")
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="Buttons" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_o0d0t")
+
+[node name="Play" type="Button" parent="Buttons"]
+layout_mode = 2
+tooltip_text = "Play game with current settings"
+text = "Play"
+
+[node name="Settings" type="Button" parent="Buttons"]
+layout_mode = 2
+tooltip_text = "Change settings"
+text = "Settings"
+
+[node name="Exit" type="Button" parent="Buttons"]
+layout_mode = 2
+tooltip_text = "Exit game"
+text = "Exit"
+
+[node name="Settings" type="VBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_tvttq")
+
+[node name="Width" type="HBoxContainer" parent="Settings"]
+layout_mode = 2
+theme_override_constants/separation = 17
+alignment = 2
+
+[node name="Width" type="Label" parent="Settings/Width"]
+layout_mode = 2
+text = "Width "
+
+[node name="WidthSlider" type="HSlider" parent="Settings/Width"]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+min_value = 2.0
+max_value = 200.0
+value = 20.0
+exp_edit = true
+
+[node name="Value" type="Label" parent="Settings/Width"]
+layout_mode = 2
+text = "20"
+
+[node name="Height" type="HBoxContainer" parent="Settings"]
+layout_mode = 2
+theme_override_constants/separation = 17
+alignment = 2
+
+[node name="Height" type="Label" parent="Settings/Height"]
+layout_mode = 2
+text = "Height"
+
+[node name="HeightSlider" type="HSlider" parent="Settings/Height"]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+min_value = 2.0
+max_value = 200.0
+value = 20.0
+exp_edit = true
+
+[node name="Value" type="Label" parent="Settings/Height"]
+layout_mode = 2
+text = "20"
+
+[node name="Bombs" type="HBoxContainer" parent="Settings"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 2
+
+[node name="Bombs" type="Label" parent="Settings/Bombs"]
+layout_mode = 2
+text = "Bombs"
+
+[node name="BombsSlider" type="HSlider" parent="Settings/Bombs"]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+min_value = 1.0
+max_value = 399.0
+value = 40.0
+exp_edit = true
+
+[node name="Value" type="Label" parent="Settings/Bombs"]
+layout_mode = 2
+text = "40"
+
+[node name="Back" type="Button" parent="Settings"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Back"
+
+[connection signal="pressed" from="Buttons/Play" to="." method="_on_play_pressed"]
+[connection signal="pressed" from="Buttons/Settings" to="." method="_on_settings_pressed"]
+[connection signal="pressed" from="Buttons/Exit" to="." method="_on_exit_pressed"]
+[connection signal="value_changed" from="Settings/Width/WidthSlider" to="." method="_on_width_slider_value_changed"]
+[connection signal="value_changed" from="Settings/Height/HeightSlider" to="." method="_on_height_slider_value_changed"]
+[connection signal="value_changed" from="Settings/Bombs/BombsSlider" to="." method="_on_bombs_slider_value_changed"]
+[connection signal="pressed" from="Settings/Back" to="." method="_on_back_pressed"]
