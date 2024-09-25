@@ -33,6 +33,7 @@ script = ExtResource("1_7mrtt")
 cell_mesh = SubResource("PlaneMesh_6ympk")
 camera = NodePath("Camera3D")
 scene_path = "res://scenes/end.tscn"
+current_scene_path = "res://scenes/game.tscn"
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
@@ -43,3 +44,11 @@ environment = SubResource("Environment_qakiv")
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 10, 0)
 script = ExtResource("4_pe86x")
+
+[node name="Time" type="Label" parent="Camera3D"]
+offset_left = 40.0
+offset_top = 30.0
+offset_right = 104.0
+offset_bottom = 75.0
+theme_override_font_sizes/font_size = 32
+text = "0:00"

@@ -28,8 +28,8 @@ func _process(delta: float) -> void:
 		position.y = 15.0 * zoom
 		if position.y < 2.0:
 			position.y = 2.0
-		elif position.y > 1000.0:
-			position.y = 1000.0
+		elif position.y > 100.0:
+			position.y = 100.0
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:

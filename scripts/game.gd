@@ -1,8 +1,11 @@
 extends Node3D
 
+@onready var time_label := $Camera3D/Time
+
 @export var cell_mesh: Mesh
 @export var camera: Camera3D
 @export var scene_path: String
+@export var current_scene_path: String
 
 var grid: PackedByteArray
 var showed_grid: PackedByteArray
@@ -44,7 +47,6 @@ func _ready() -> void:
 	area.add_child(collision)
 	area.connect("input_event", _area_on_input_event)
 	add_child(area)
-	start = Time.get_ticks_msec()
 
 func _exit_tree() -> void:
 	RenderingServer.free_rid(instance)
@@ -52,7 +54,14 @@ func _exit_tree() -> void:
 	GameSettings.emulate_mouse = true
 
 func _process(delta: float) -> void:
-	if generated: check_win()
+	if generated: 
+		check_win()
+		var time := (Time.get_ticks_msec() - start) / 1000.0
+		var minutes: int = floorf(time / 60.0)
+		var seconds := int(floorf(time)) % 60
+		time_label.text = "%d:%02d" % [minutes, seconds]
+	if Input.is_action_just_pressed("reset"):
+		reset()
 
 func _area_on_input_event(camera: Node, event: InputEvent, event_position: Vector3, normal: Vector3, shape_idx: int):
 	if event is InputEventMouseButton:
@@ -128,6 +137,7 @@ func generate_grid(click_position: Vector2i):
 				grid.encode_s8(index_offset, grid.decode_s8(index_offset) + 1)
 		bombs -= 1
 	generated = true
+	start = Time.get_ticks_msec()
 
 func prepare_lose():
 	var end := Time.get_ticks_msec()
@@ -213,3 +223,6 @@ func end_game(win: bool, end: int = 0):
 	GameSettings.win = win
 	GameSettings.timer = end - start
 	get_tree().change_scene_to_file(scene_path)
+
+func reset():
+	get_tree().change_scene_to_file(current_scene_path)
