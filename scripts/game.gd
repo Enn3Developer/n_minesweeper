@@ -1,6 +1,6 @@
 extends Node3D
 
-@onready var time_label := $Camera3D/Time
+@onready var time_label := $Camera3D/Stats/Time
 
 @export var cell_mesh: Mesh
 @export var camera: Camera3D
@@ -79,25 +79,26 @@ func _input(event: InputEvent) -> void:
 		mouse_event.pressed = true
 		mouse_event.button_index = MOUSE_BUTTON_LEFT
 		mouse_event.position = touch_event.position
-		Input.parse_input_event(mouse_event)
+		get_viewport().push_input(mouse_event, true)
 		var new_event := mouse_event.duplicate(true)
 		new_event.pressed = false
-		Input.parse_input_event(new_event)
+		get_viewport().push_input(new_event, true)
 	elif event is InputEventSingleScreenLongPress:
 		var touch_event: InputEventSingleScreenLongPress = event
 		var mouse_event := InputEventMouseButton.new()
 		mouse_event.pressed = true
 		mouse_event.button_index = MOUSE_BUTTON_RIGHT
 		mouse_event.position = touch_event.position
-		Input.parse_input_event(mouse_event)
+		get_viewport().push_input(mouse_event, true)
 		var new_event := mouse_event.duplicate(true)
 		new_event.pressed = false
-		Input.parse_input_event(new_event)
+		get_viewport().push_input(new_event, true)
 
 func click_show(position: Vector2i):
 	var index := position.y * width + position.x
 	if not generated:
 		generate_grid(position)
+	if flagged_grid.decode_s8(index) == 1: return
 	if grid.decode_s8(index) == -1:
 		prepare_lose()
 		return
@@ -226,3 +227,6 @@ func end_game(win: bool, end: int = 0):
 
 func reset():
 	get_tree().change_scene_to_file(current_scene_path)
+
+func _on_reset_pressed() -> void:
+	reset()

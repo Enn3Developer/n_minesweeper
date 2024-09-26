@@ -25,11 +25,10 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch and emulate_mouse:
 		var touch_event: InputEventScreenTouch = event
 		var mouse_event := InputEventMouseButton.new()
-		mouse_event.window_id = touch_event.window_id
 		mouse_event.position = touch_event.position
 		mouse_event.pressed = touch_event.pressed
 		mouse_event.button_index = MOUSE_BUTTON_LEFT
-		Input.parse_input_event(mouse_event)
+		get_viewport().push_input(mouse_event, true)
 	elif event is InputEventScreenDrag and emulate_mouse:
 		var drag_event: InputEventScreenDrag = event
 		var mouse_event := InputEventMouseMotion.new()
@@ -41,5 +40,6 @@ func _input(event: InputEvent) -> void:
 		mouse_event.tilt = drag_event.tilt
 		mouse_event.velocity = drag_event.velocity
 		mouse_event.position = drag_event.position
+		mouse_event.global_position = drag_event.position
 		mouse_event.window_id = drag_event.window_id
-		Input.parse_input_event(mouse_event)
+		get_viewport().push_input(mouse_event, true)
