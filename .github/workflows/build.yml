@@ -11,18 +11,49 @@ env:
   PROJECT_PATH: n_mines
 
 jobs:
-  build-linux:
+  build-win:
     runs-on: ubuntu-latest
     container:
       image: barichello/godot-ci:4.3
-
     steps:
       - uses: actions/checkout@v4
       - name: Setup
         run: |
           mkdir -v -p ~/.local/share/godot/export_templates/
           mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
-      - name: Linux Build
+      - name: Build
+        run: |
+          mkdir -v -p build/win
+          godot --headless --verbose --export-release "Windows Desktop" "build/win/NMines.exe"
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: win
+          path: build/win
+      - name: Zip files
+        uses: vimtor/action-zip@v1.2
+        with:
+          files: build/win/NMines.exe
+          dest: "N Mines Windows.zip"
+      - name: Publish in release
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          files: |
+            N Mines Windows.zip
+
+            
+  build-linux:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup
+        run: |
+          mkdir -v -p ~/.local/share/godot/export_templates/
+          mv /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+      - name: Build
         run: |
           mkdir -v -p build/linux
           godot --headless --verbose --export-release "Linux" "build/linux/NMines.x86_64"
@@ -31,7 +62,7 @@ jobs:
         with:
           name: linux
           path: build/linux
-      - name: Easy Zip Files
+      - name: Zip files
         uses: vimtor/action-zip@v1.2
         with:
           files: build/linux/NMines.x86_64
