@@ -56,6 +56,13 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "0:00"
+horizontal_alignment = 1
+
+[node name="Flags" type="Label" parent="Camera3D/Stats"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "40 Flags"
+horizontal_alignment = 1
 
 [node name="Reset" type="Button" parent="Camera3D/Stats"]
 layout_mode = 2

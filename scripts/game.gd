@@ -1,6 +1,7 @@
 extends Node3D
 
 @onready var time_label := $Camera3D/Stats/Time
+@onready var flags_label := $Camera3D/Stats/Flags
 
 @export var cell_mesh: Mesh
 @export var camera: Camera3D
@@ -24,6 +25,7 @@ func _ready() -> void:
 	height = GameSettings.height
 	width = GameSettings.width
 	bombs = GameSettings.bombs
+	flags_label.text = str(bombs) + " Flags"
 	multimesh = RenderingServer.multimesh_create()
 	RenderingServer.multimesh_set_mesh(multimesh, cell_mesh.get_rid())
 	RenderingServer.multimesh_allocate_data(multimesh, width * height,
@@ -211,6 +213,7 @@ func flag_cell(cell_position: Vector2i):
 		flagged -= 1
 		cell = 0.0
 	flagged_grid.encode_s8(index, value)
+	flags_label.text = str(GameSettings.bombs - flagged) + " Flags"
 	RenderingServer.multimesh_instance_set_custom_data(multimesh, index, Color(0.0, cell, 1.0, 12.0))
 
 func check_win():
