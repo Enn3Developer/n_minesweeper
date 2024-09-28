@@ -36,7 +36,7 @@ func _ready() -> void:
 			var index := z * width + x
 			var transform = Transform3D(Basis.IDENTITY, Vector3(x + 0.5, 0.0, z + 0.5))
 			RenderingServer.multimesh_instance_set_transform(multimesh, index, transform)
-			RenderingServer.multimesh_instance_set_custom_data(multimesh, index, Color(0.0, 0.0, 1.0, 12.0))
+			RenderingServer.multimesh_instance_set_custom_data(multimesh, index, Color(0.0, 0.0, 0.0, 0.0))
 	instance = RenderingServer.instance_create()
 	RenderingServer.instance_set_base(instance, multimesh)
 	RenderingServer.instance_set_scenario(instance, get_world_3d().scenario)
@@ -200,7 +200,7 @@ func show_cell(cell_position: Vector2i):
 		cell = 2.0
 	else:
 		cell = 3.0 + value
-	RenderingServer.multimesh_instance_set_custom_data(multimesh, index, Color(0.0, cell, 1.0, 12.0))
+	RenderingServer.multimesh_instance_set_custom_data(multimesh, index, Color(0.0, cell, 0.0, 0.0))
 	showed_grid.encode_s8(index, 1)
 
 func flag_cell(cell_position: Vector2i):
@@ -219,7 +219,7 @@ func flag_cell(cell_position: Vector2i):
 		cell = 0.0
 	flagged_grid.encode_s8(index, value)
 	flags_label.text = str(GameSettings.bombs - flagged) + " Flags"
-	RenderingServer.multimesh_instance_set_custom_data(multimesh, index, Color(0.0, cell, 1.0, 12.0))
+	RenderingServer.multimesh_instance_set_custom_data(multimesh, index, Color(0.0, cell, 0.0, 0.0))
 
 func check_win():
 	if flagged != GameSettings.bombs: return

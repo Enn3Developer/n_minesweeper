@@ -7,7 +7,7 @@ uniform sampler2D texture_albedo : source_color, filter_linear_mipmap, repeat_en
 uniform vec3 uv1_scale;
 
 void vertex() {
-	UV = (UV * uv1_scale.xy + INSTANCE_CUSTOM.xy) / INSTANCE_CUSTOM.zw;
+	UV = (UV * uv1_scale.xy + INSTANCE_CUSTOM.xy) / vec2(1.0, 12.0);
 }
 
 void fragment() {
