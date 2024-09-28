@@ -38,6 +38,13 @@ window/handheld/orientation=6
 
 project/assembly_name="N Mines"
 
+[gui]
+
+theme/custom="res://assets/themes/default_theme.tres"
+theme/custom_font="res://assets/fonts/FiraSans.ttf"
+theme/default_font_antialiasing=0
+theme/default_font_hinting=0
+
 [input]
 
 ui_left={

@@ -1,12 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://dcwvbecb6eimq"]
+[gd_scene load_steps=2 format=3 uid="uid://dcwvbecb6eimq"]
 
 [ext_resource type="Script" path="res://scripts/menu.gd" id="1_6wwdr"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_4qkd1"]
-font_size = 64
-
-[sub_resource type="LabelSettings" id="LabelSettings_g72v7"]
-font_size = 20
 
 [node name="Menu" type="Control"]
 layout_mode = 3
@@ -29,14 +23,14 @@ grow_horizontal = 2
 
 [node name="Title" type="Label" parent="TitleBar"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 64
 text = "N Mines"
-label_settings = SubResource("LabelSettings_4qkd1")
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="Version" type="Label" parent="TitleBar"]
 layout_mode = 2
-label_settings = SubResource("LabelSettings_g72v7")
+theme_override_font_sizes/font_size = 20
 horizontal_alignment = 2
 vertical_alignment = 1
 
