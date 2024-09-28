@@ -95,10 +95,15 @@ text = "Normal"
 layout_mode = 2
 text = "Hard"
 
+[node name="Custom" type="Button" parent="Settings/Presets"]
+layout_mode = 2
+text = "Custom
+"
+
 [node name="Width" type="HBoxContainer" parent="Settings"]
 layout_mode = 2
 theme_override_constants/separation = 17
-alignment = 2
+alignment = 1
 
 [node name="Width" type="Label" parent="Settings/Width"]
 layout_mode = 2
@@ -111,6 +116,7 @@ min_value = 2.0
 max_value = 200.0
 value = 20.0
 exp_edit = true
+editable = false
 
 [node name="Value" type="Label" parent="Settings/Width"]
 layout_mode = 2
@@ -119,7 +125,7 @@ text = "20"
 [node name="Height" type="HBoxContainer" parent="Settings"]
 layout_mode = 2
 theme_override_constants/separation = 17
-alignment = 2
+alignment = 1
 
 [node name="Height" type="Label" parent="Settings/Height"]
 layout_mode = 2
@@ -132,6 +138,7 @@ min_value = 2.0
 max_value = 200.0
 value = 20.0
 exp_edit = true
+editable = false
 
 [node name="Value" type="Label" parent="Settings/Height"]
 layout_mode = 2
@@ -140,7 +147,7 @@ text = "20"
 [node name="Bombs" type="HBoxContainer" parent="Settings"]
 layout_mode = 2
 theme_override_constants/separation = 16
-alignment = 2
+alignment = 1
 
 [node name="Bombs" type="Label" parent="Settings/Bombs"]
 layout_mode = 2
@@ -153,6 +160,7 @@ min_value = 1.0
 max_value = 399.0
 value = 40.0
 exp_edit = true
+editable = false
 
 [node name="Value" type="Label" parent="Settings/Bombs"]
 layout_mode = 2
@@ -169,6 +177,7 @@ text = "Back"
 [connection signal="pressed" from="Settings/Presets/Easy" to="." method="_on_easy_pressed"]
 [connection signal="pressed" from="Settings/Presets/Normal" to="." method="_on_normal_pressed"]
 [connection signal="pressed" from="Settings/Presets/Hard" to="." method="_on_hard_pressed"]
+[connection signal="pressed" from="Settings/Presets/Custom" to="." method="_on_custom_pressed"]
 [connection signal="value_changed" from="Settings/Width/WidthSlider" to="." method="_on_width_slider_value_changed"]
 [connection signal="value_changed" from="Settings/Height/HeightSlider" to="." method="_on_height_slider_value_changed"]
 [connection signal="value_changed" from="Settings/Bombs/BombsSlider" to="." method="_on_bombs_slider_value_changed"]

@@ -50,13 +50,27 @@ func _on_easy_pressed() -> void:
 	height_slider.value = 10
 	width_slider.value = 10
 	bombs_slider.value = 8
+	height_slider.editable = false
+	width_slider.editable = false
+	bombs_slider.editable = false
 
 func _on_normal_pressed() -> void:
 	height_slider.value = 20
 	width_slider.value = 20
 	bombs_slider.value = 40
+	height_slider.editable = false
+	width_slider.editable = false
+	bombs_slider.editable = false
 
 func _on_hard_pressed() -> void:
 	height_slider.value = 30
 	width_slider.value = 30
 	bombs_slider.value = 120
+	height_slider.editable = false
+	width_slider.editable = false
+	bombs_slider.editable = false
+
+func _on_custom_pressed() -> void:
+	height_slider.editable = true
+	width_slider.editable = true
+	bombs_slider.editable = true
