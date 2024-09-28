@@ -37,7 +37,7 @@ jobs:
           cd $PROJECT_PATH
           godot --headless --verbose --export-release "Linux" ../build/linux/$EXPORT_NAME.x86_64
       - name: Upload Artifact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: linux
           path: build/linux
