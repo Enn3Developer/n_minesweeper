@@ -205,6 +205,7 @@ func flag_cell(cell_position: Vector2i):
 	var value := flagged_grid.decode_s8(index)
 	var cell: float
 	if value == 0:
+		if flagged == GameSettings.bombs: return
 		value = 1
 		flagged += 1
 		cell = 3.0
