@@ -31,9 +31,14 @@ jobs:
         with:
           name: linux
           path: build/linux
+      - name: Easy Zip Files
+        uses: vimtor/action-zip@v1.2
+        with:
+          files: "build/linux/N Mines.x86_64"
+          dest: "N Mines Linux.zip"
       - name: Publish in release
         uses: softprops/action-gh-release@v2
         if: github.ref_type == 'tag'
         with:
           files: |
-            build/linux/N Mines.x86_64
+            N Mines Linux.zip
