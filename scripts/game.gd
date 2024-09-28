@@ -19,6 +19,7 @@ var width: int
 var bombs: int
 var generated := false
 var start := 0
+var losing := false
 
 func _ready() -> void:
 	GameSettings.emulate_mouse = false
@@ -56,6 +57,7 @@ func _exit_tree() -> void:
 	GameSettings.emulate_mouse = true
 
 func _process(delta: float) -> void:
+	if losing: return
 	if generated: 
 		check_win()
 		var time := (Time.get_ticks_msec() - start) / 1000.0
@@ -66,6 +68,7 @@ func _process(delta: float) -> void:
 		reset()
 
 func _area_on_input_event(camera: Node, event: InputEvent, event_position: Vector3, normal: Vector3, shape_idx: int):
+	if losing: return
 	if event is InputEventMouseButton:
 		if event.pressed:
 			var position := Vector2i(floorf(event_position.x), floorf(event_position.z))
@@ -147,6 +150,7 @@ func generate_grid(click_position: Vector2i):
 	start = Time.get_ticks_msec()
 
 func prepare_lose():
+	losing = true
 	var end := Time.get_ticks_msec()
 	var timer := Timer.new()
 	timer.wait_time = 2.0
