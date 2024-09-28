@@ -4,6 +4,8 @@ extends Control
 @onready var height_value := $Settings/Height/Value
 @onready var bombs_value := $Settings/Bombs/Value
 
+@onready var height_slider := $Settings/Height/HeightSlider
+@onready var width_slider := $Settings/Width/WidthSlider
 @onready var bombs_slider := $Settings/Bombs/BombsSlider
 
 func _ready() -> void:
@@ -12,8 +14,8 @@ func _ready() -> void:
 	$Settings.visible = false
 	if OS.has_feature("web") or OS.has_feature("mobile"):
 		$Buttons/Exit.visible = false
-	$Settings/Height/HeightSlider.value = GameSettings.height
-	$Settings/Width/WidthSlider.value = GameSettings.width
+	height_slider.value = GameSettings.height
+	width_slider.value = GameSettings.width
 	bombs_slider.value = GameSettings.bombs
 
 func _on_play_pressed() -> void:
@@ -43,3 +45,18 @@ func _on_height_slider_value_changed(value: float) -> void:
 func _on_bombs_slider_value_changed(value: float) -> void:
 	GameSettings.bombs = int(value)
 	bombs_value.text = str(GameSettings.bombs)
+
+func _on_easy_pressed() -> void:
+	height_slider.value = 10
+	width_slider.value = 10
+	bombs_slider.value = 8
+
+func _on_normal_pressed() -> void:
+	height_slider.value = 20
+	width_slider.value = 20
+	bombs_slider.value = 40
+
+func _on_hard_pressed() -> void:
+	height_slider.value = 30
+	width_slider.value = 30
+	bombs_slider.value = 120

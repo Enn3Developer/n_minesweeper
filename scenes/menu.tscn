@@ -35,6 +35,7 @@ horizontal_alignment = 2
 vertical_alignment = 1
 
 [node name="Buttons" type="VBoxContainer" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -64,7 +65,6 @@ tooltip_text = "Exit game"
 text = "Exit"
 
 [node name="Settings" type="VBoxContainer" parent="."]
-visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -77,6 +77,23 @@ offset_right = 20.0
 offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Presets" type="HBoxContainer" parent="Settings"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Easy" type="Button" parent="Settings/Presets"]
+layout_mode = 2
+text = "Easy"
+
+[node name="Normal" type="Button" parent="Settings/Presets"]
+layout_mode = 2
+text = "Normal"
+
+[node name="Hard" type="Button" parent="Settings/Presets"]
+layout_mode = 2
+text = "Hard"
 
 [node name="Width" type="HBoxContainer" parent="Settings"]
 layout_mode = 2
@@ -149,6 +166,9 @@ text = "Back"
 [connection signal="pressed" from="Buttons/Play" to="." method="_on_play_pressed"]
 [connection signal="pressed" from="Buttons/Settings" to="." method="_on_settings_pressed"]
 [connection signal="pressed" from="Buttons/Exit" to="." method="_on_exit_pressed"]
+[connection signal="pressed" from="Settings/Presets/Easy" to="." method="_on_easy_pressed"]
+[connection signal="pressed" from="Settings/Presets/Normal" to="." method="_on_normal_pressed"]
+[connection signal="pressed" from="Settings/Presets/Hard" to="." method="_on_hard_pressed"]
 [connection signal="value_changed" from="Settings/Width/WidthSlider" to="." method="_on_width_slider_value_changed"]
 [connection signal="value_changed" from="Settings/Height/HeightSlider" to="." method="_on_height_slider_value_changed"]
 [connection signal="value_changed" from="Settings/Bombs/BombsSlider" to="." method="_on_bombs_slider_value_changed"]
