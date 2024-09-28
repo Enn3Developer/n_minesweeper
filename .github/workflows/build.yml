@@ -25,7 +25,7 @@ jobs:
       - name: Linux Build
         run: |
           mkdir -v -p build/linux
-          godot --headless --verbose --export-release "Linux" "build/linux/N Mines.x86_64"
+          godot --headless --verbose --export-release "Linux" "build/linux/NMines.x86_64"
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
@@ -34,7 +34,7 @@ jobs:
       - name: Easy Zip Files
         uses: vimtor/action-zip@v1.2
         with:
-          files: "build/linux/N Mines.x86_64"
+          files: build/linux/NMines.x86_64
           dest: "N Mines Linux.zip"
       - name: Publish in release
         uses: softprops/action-gh-release@v2
