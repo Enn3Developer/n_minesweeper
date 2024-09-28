@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://dcwvbecb6eimq"]
+[gd_scene load_steps=4 format=3 uid="uid://dcwvbecb6eimq"]
 
 [ext_resource type="Script" path="res://scripts/menu.gd" id="1_6wwdr"]
 
@@ -7,12 +7,6 @@ font_size = 64
 
 [sub_resource type="LabelSettings" id="LabelSettings_g72v7"]
 font_size = 20
-
-[sub_resource type="Theme" id="Theme_o0d0t"]
-default_font_size = 32
-
-[sub_resource type="Theme" id="Theme_tvttq"]
-default_font_size = 32
 
 [node name="Menu" type="Control"]
 layout_mode = 3
@@ -53,13 +47,12 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
+offset_left = -66.0
+offset_top = -83.5
+offset_right = 66.0
+offset_bottom = 83.5
 grow_horizontal = 2
 grow_vertical = 2
-theme = SubResource("Theme_o0d0t")
 
 [node name="Play" type="Button" parent="Buttons"]
 layout_mode = 2
@@ -90,7 +83,6 @@ offset_right = 20.0
 offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = SubResource("Theme_tvttq")
 
 [node name="Width" type="HBoxContainer" parent="Settings"]
 layout_mode = 2

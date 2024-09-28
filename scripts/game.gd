@@ -105,6 +105,7 @@ func click_show(position: Vector2i):
 	show_cell_and_neighbours(position)
 
 func click_flag(position: Vector2i):
+	if not generated: return
 	var index := position.y * width + position.x
 	if showed_grid.decode_s8(index) == 1: return
 	flag_cell(position)
