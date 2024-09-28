@@ -67,7 +67,7 @@ jobs:
         if: github.ref_type == 'tag'
         with:
           files: |
-            N.Mines.Mac.zip
+            build/mac/N.Mines.Mac.zip
 
             
   build-linux:
