@@ -103,6 +103,8 @@ func click_show(position: Vector2i):
 	var index := position.y * width + position.x
 	if not generated:
 		generate_grid(position)
+		$Camera3D/StartGame.visible = false
+		$AnimationPlayer.stop()
 	if flagged_grid.decode_s8(index) == 1: return
 	if grid.decode_s8(index) == -1:
 		prepare_lose()
