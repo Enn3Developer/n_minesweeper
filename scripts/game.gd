@@ -106,17 +106,17 @@ func click_show(position: Vector2i):
 	if flagged_grid.decode_s8(index) == 1: return
 	if grid.decode_s8(index) == -1:
 		prepare_lose()
-		Input.vibrate_handheld(200, 0.7)
+		if GameSettings.vibration: Input.vibrate_handheld(200, 0.7)
 		return
 	show_cell_and_neighbours(position)
-	Input.vibrate_handheld(500, 1.0)
+	if GameSettings.vibration: Input.vibrate_handheld(500, 1.0)
 
 func click_flag(position: Vector2i):
 	if not generated: return
 	var index := position.y * width + position.x
 	if showed_grid.decode_s8(index) == 1: return
 	flag_cell(position)
-	Input.vibrate_handheld(500, 1.0)
+	if GameSettings.vibration: Input.vibrate_handheld(500, 1.0)
 
 func generate_grid(click_position: Vector2i):
 	grid = PackedByteArray()

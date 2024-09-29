@@ -21,6 +21,8 @@ var win := false
 
 var emulate_mouse := true
 
+var vibration := true
+
 func _input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch and emulate_mouse:
 		var touch_event: InputEventScreenTouch = event

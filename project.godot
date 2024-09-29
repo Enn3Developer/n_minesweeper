@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="N Mines"
-config/version="0.9.0-beta2"
+config/version="0.9.1"
 run/main_scene="res://scenes/menu.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 run/low_processor_mode=true

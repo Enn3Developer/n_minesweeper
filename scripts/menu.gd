@@ -18,6 +18,10 @@ func _ready() -> void:
 	width_slider.value = GameSettings.width
 	bombs_slider.value = GameSettings.bombs
 
+func press_custom_if_not() -> void:
+	if not $Settings/Presets/Custom.button_pressed:
+		$Settings/Presets/Custom.button_pressed = true
+
 func _on_play_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/game.tscn")
 
@@ -34,43 +38,41 @@ func _on_back_pressed() -> void:
 
 func _on_width_slider_value_changed(value: float) -> void:
 	GameSettings.width = int(value)
-	width_value.text = str(GameSettings.width)
+	width_value.text = "%5d" % GameSettings.width
 	bombs_slider.max_value = GameSettings.width * GameSettings.height - 1
+	press_custom_if_not()
 
 func _on_height_slider_value_changed(value: float) -> void:
 	GameSettings.height = int(value)
-	height_value.text = str(GameSettings.height)
+	height_value.text = "%5d" % GameSettings.height
 	bombs_slider.max_value = GameSettings.width * GameSettings.height - 1
+	press_custom_if_not()
 
 func _on_bombs_slider_value_changed(value: float) -> void:
 	GameSettings.bombs = int(value)
-	bombs_value.text = str(GameSettings.bombs)
+	bombs_value.text = "%5d" % GameSettings.bombs
+	press_custom_if_not()
 
 func _on_easy_pressed() -> void:
 	height_slider.value = 10
 	width_slider.value = 10
 	bombs_slider.value = 8
-	height_slider.editable = false
-	width_slider.editable = false
-	bombs_slider.editable = false
+	$Settings/Presets/Easy.button_pressed = true
 
 func _on_normal_pressed() -> void:
 	height_slider.value = 20
 	width_slider.value = 20
 	bombs_slider.value = 40
-	height_slider.editable = false
-	width_slider.editable = false
-	bombs_slider.editable = false
+	$Settings/Presets/Normal.button_pressed = true
 
 func _on_hard_pressed() -> void:
 	height_slider.value = 30
 	width_slider.value = 30
 	bombs_slider.value = 120
-	height_slider.editable = false
-	width_slider.editable = false
-	bombs_slider.editable = false
+	$Settings/Presets/Hard.button_pressed = true
 
 func _on_custom_pressed() -> void:
-	height_slider.editable = true
-	width_slider.editable = true
-	bombs_slider.editable = true
+	pass
+
+func _on_vibration_toggled(toggled_on: bool) -> void:
+	GameSettings.vibration = toggled_on

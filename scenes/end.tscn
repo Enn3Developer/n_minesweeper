@@ -27,6 +27,8 @@ offset_right = 20.0
 offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
 
 [node name="State" type="Label" parent="VBoxContainer"]
 layout_mode = 2
@@ -34,7 +36,13 @@ text = "You lost in 0.0s"
 label_settings = SubResource("LabelSettings_c362g")
 horizontal_alignment = 1
 
-[node name="Exit" type="Label" parent="VBoxContainer"]
+[node name="PlayAgain" type="Button" parent="VBoxContainer"]
 layout_mode = 2
-text = "Click to return to the main menu"
-horizontal_alignment = 1
+text = "Play Again"
+
+[node name="Return" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Return to main menu"
+
+[connection signal="pressed" from="VBoxContainer/PlayAgain" to="." method="_on_play_again_pressed"]
+[connection signal="pressed" from="VBoxContainer/Return" to="." method="_on_return_pressed"]

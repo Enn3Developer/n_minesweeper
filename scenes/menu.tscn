@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://dcwvbecb6eimq"]
+[gd_scene load_steps=3 format=3 uid="uid://dcwvbecb6eimq"]
 
 [ext_resource type="Script" path="res://scripts/menu.gd" id="1_6wwdr"]
+[ext_resource type="ButtonGroup" uid="uid://76f1lrmgucw7" path="res://assets/difficulty_group.tres" id="2_jkig2"]
 
 [node name="Menu" type="Control"]
 layout_mode = 3
@@ -85,18 +86,26 @@ alignment = 1
 
 [node name="Easy" type="Button" parent="Settings/Presets"]
 layout_mode = 2
+toggle_mode = true
+button_group = ExtResource("2_jkig2")
 text = "Easy"
 
 [node name="Normal" type="Button" parent="Settings/Presets"]
 layout_mode = 2
+toggle_mode = true
+button_group = ExtResource("2_jkig2")
 text = "Normal"
 
 [node name="Hard" type="Button" parent="Settings/Presets"]
 layout_mode = 2
+toggle_mode = true
+button_group = ExtResource("2_jkig2")
 text = "Hard"
 
 [node name="Custom" type="Button" parent="Settings/Presets"]
 layout_mode = 2
+toggle_mode = true
+button_group = ExtResource("2_jkig2")
 text = "Custom
 "
 
@@ -116,7 +125,6 @@ min_value = 2.0
 max_value = 200.0
 value = 20.0
 exp_edit = true
-editable = false
 
 [node name="Value" type="Label" parent="Settings/Width"]
 layout_mode = 2
@@ -138,7 +146,6 @@ min_value = 2.0
 max_value = 200.0
 value = 20.0
 exp_edit = true
-editable = false
 
 [node name="Value" type="Label" parent="Settings/Height"]
 layout_mode = 2
@@ -160,11 +167,19 @@ min_value = 1.0
 max_value = 399.0
 value = 40.0
 exp_edit = true
-editable = false
 
 [node name="Value" type="Label" parent="Settings/Bombs"]
 layout_mode = 2
 text = "40"
+
+[node name="Vibration" type="HBoxContainer" parent="Settings"]
+layout_mode = 2
+alignment = 1
+
+[node name="Vibration" type="CheckButton" parent="Settings/Vibration"]
+layout_mode = 2
+button_pressed = true
+text = "Vibration"
 
 [node name="Back" type="Button" parent="Settings"]
 layout_mode = 2
@@ -181,4 +196,5 @@ text = "Back"
 [connection signal="value_changed" from="Settings/Width/WidthSlider" to="." method="_on_width_slider_value_changed"]
 [connection signal="value_changed" from="Settings/Height/HeightSlider" to="." method="_on_height_slider_value_changed"]
 [connection signal="value_changed" from="Settings/Bombs/BombsSlider" to="." method="_on_bombs_slider_value_changed"]
+[connection signal="toggled" from="Settings/Vibration/Vibration" to="." method="_on_vibration_toggled"]
 [connection signal="pressed" from="Settings/Back" to="." method="_on_back_pressed"]
