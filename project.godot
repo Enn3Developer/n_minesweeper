@@ -11,8 +11,10 @@ config_version=5
 [application]
 
 config/name="N Mines"
-config/version="0.9.1"
+config/version="0.9.2"
 run/main_scene="res://scenes/menu.tscn"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="n_mines"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 run/low_processor_mode=true
 config/icon="res://icon.svg"
@@ -20,6 +22,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 InputManager="*res://GDTIM/InputManager.gd"
+Logger="*res://addons/gs_logger/logger.gd"
 GameSettings="*res://scripts/game_settings.gd"
 
 [debug]
@@ -36,6 +39,10 @@ window/stretch/aspect="expand"
 [dotnet]
 
 project/assembly_name="N Mines"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gs_logger/plugin.cfg")
 
 [gui]
 

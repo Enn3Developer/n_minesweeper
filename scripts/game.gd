@@ -79,6 +79,7 @@ func _area_on_input_event(camera: Node, event: InputEvent, event_position: Vecto
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventSingleScreenTap:
+		Logger.info("received tap input")
 		var touch_event: InputEventSingleScreenTap = event
 		var mouse_event := InputEventMouseButton.new()
 		mouse_event.pressed = true
@@ -89,6 +90,7 @@ func _input(event: InputEvent) -> void:
 		new_event.pressed = false
 		get_viewport().push_input(new_event, true)
 	elif event is InputEventSingleScreenLongPress:
+		Logger.info("received long press input")
 		var touch_event: InputEventSingleScreenLongPress = event
 		var mouse_event := InputEventMouseButton.new()
 		mouse_event.pressed = true
@@ -100,6 +102,7 @@ func _input(event: InputEvent) -> void:
 		get_viewport().push_input(new_event, true)
 
 func click_show(position: Vector2i):
+	Logger.info("received show input: " + str(position))
 	var index := position.y * width + position.x
 	if not generated:
 		generate_grid(position)
@@ -107,6 +110,7 @@ func click_show(position: Vector2i):
 		$AnimationPlayer.stop()
 	if flagged_grid.decode_s8(index) == 1: return
 	if grid.decode_s8(index) == -1:
+		Logger.info("clicked on bomb")
 		prepare_lose()
 		if GameSettings.vibration: Input.vibrate_handheld(200, 0.7)
 		return
@@ -114,6 +118,7 @@ func click_show(position: Vector2i):
 	if GameSettings.vibration: Input.vibrate_handheld(500, 1.0)
 
 func click_flag(position: Vector2i):
+	Logger.info("received flag input: " + str(position))
 	if not generated: return
 	var index := position.y * width + position.x
 	if showed_grid.decode_s8(index) == 1: return
@@ -121,6 +126,7 @@ func click_flag(position: Vector2i):
 	if GameSettings.vibration: Input.vibrate_handheld(500, 1.0)
 
 func generate_grid(click_position: Vector2i):
+	Logger.info("generating grid")
 	grid = PackedByteArray()
 	showed_grid = PackedByteArray()
 	flagged_grid = PackedByteArray()
@@ -150,6 +156,7 @@ func generate_grid(click_position: Vector2i):
 		bombs -= 1
 	generated = true
 	start = Time.get_ticks_msec()
+	Logger.info("grid generated")
 
 func prepare_lose():
 	losing = true
