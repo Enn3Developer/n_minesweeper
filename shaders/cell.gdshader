@@ -12,7 +12,7 @@ void vertex() {
 
 void fragment() {
 	vec2 base_uv = UV;
-	
+
 	vec4 albedo_tex = texture(texture_albedo, base_uv);
 	ALBEDO = albedo.rgb * albedo_tex.rgb;
 }
