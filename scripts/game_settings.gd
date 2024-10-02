@@ -15,6 +15,11 @@ var bombs := 40:
 		bombs = max(1, min(value, width*height - 1))
 	get:
 		return bombs
+var speed := 10:
+	set(value):
+		speed = max(2, min(value, 40))
+	get:
+		return speed
 
 var timer := 0
 var win := false

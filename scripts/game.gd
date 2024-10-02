@@ -8,6 +8,8 @@ extends Node3D
 @export var scene_path: String
 @export var current_scene_path: String
 
+signal processed
+
 var grid: PackedByteArray
 var showed_grid: PackedByteArray
 var flagged_grid: PackedByteArray
@@ -57,6 +59,7 @@ func _exit_tree() -> void:
 	GameSettings.emulate_mouse = true
 
 func _process(delta: float) -> void:
+	emit_signal("processed")
 	if losing: return
 	if generated: 
 		check_win()
@@ -161,26 +164,25 @@ func generate_grid(click_position: Vector2i):
 func prepare_lose():
 	losing = true
 	var end := Time.get_ticks_msec()
-	var timer := Timer.new()
-	timer.wait_time = 2.0
-	timer.autostart = true
-	timer.one_shot = true
-	timer.connect("timeout", func timeout():
-		end_game(false, end)
-	)
 	for x in range(width):
 		for y in range(height):
 			var index := y * width + x
 			var value := grid.decode_s8(index)
 			if value != -1: continue
 			show_cell(Vector2i(x, y))
-	add_child(timer)
+	await get_tree().create_timer(2.0).timeout
+	end_game(false, end)
 
 func show_cell_and_neighbours(cell_position: Vector2i):
 	var positions: Array[Vector2i] = []
 	positions.append(cell_position)
+	var cells_showed := 0
 	while positions.size() > 0:
-		var position: Vector2i = positions.pop_back()
+		cells_showed += 1
+		if cells_showed >= GameSettings.speed:
+			cells_showed = 0
+			await processed
+		var position: Vector2i = positions.pop_front()
 		var index := position.y * width + position.x
 		if showed_grid.decode_s8(index) == 1: continue
 		if flagged_grid.decode_s8(index) == 1: continue

@@ -119,7 +119,7 @@ layout_mode = 2
 text = "Width "
 
 [node name="WidthSlider" type="HSlider" parent="Settings/Width"]
-custom_minimum_size = Vector2(200, 60)
+custom_minimum_size = Vector2(250, 60)
 layout_mode = 2
 min_value = 2.0
 max_value = 200.0
@@ -140,7 +140,7 @@ layout_mode = 2
 text = "Height"
 
 [node name="HeightSlider" type="HSlider" parent="Settings/Height"]
-custom_minimum_size = Vector2(200, 60)
+custom_minimum_size = Vector2(250, 60)
 layout_mode = 2
 min_value = 2.0
 max_value = 200.0
@@ -161,7 +161,7 @@ layout_mode = 2
 text = "Bombs"
 
 [node name="BombsSlider" type="HSlider" parent="Settings/Bombs"]
-custom_minimum_size = Vector2(200, 60)
+custom_minimum_size = Vector2(250, 60)
 layout_mode = 2
 min_value = 1.0
 max_value = 399.0
@@ -171,6 +171,28 @@ exp_edit = true
 [node name="Value" type="Label" parent="Settings/Bombs"]
 layout_mode = 2
 text = "40"
+
+[node name="Speed" type="HBoxContainer" parent="Settings"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Speed" type="Label" parent="Settings/Speed"]
+layout_mode = 2
+text = "Speed"
+
+[node name="SpeedSlider" type="HSlider" parent="Settings/Speed"]
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+min_value = 2.0
+max_value = 40.0
+value = 10.0
+exp_edit = true
+
+[node name="Value" type="Label" parent="Settings/Speed"]
+layout_mode = 2
+text = "10
+"
 
 [node name="Vibration" type="HBoxContainer" parent="Settings"]
 layout_mode = 2
@@ -196,5 +218,6 @@ text = "Back"
 [connection signal="value_changed" from="Settings/Width/WidthSlider" to="." method="_on_width_slider_value_changed"]
 [connection signal="value_changed" from="Settings/Height/HeightSlider" to="." method="_on_height_slider_value_changed"]
 [connection signal="value_changed" from="Settings/Bombs/BombsSlider" to="." method="_on_bombs_slider_value_changed"]
+[connection signal="value_changed" from="Settings/Speed/SpeedSlider" to="." method="_on_speed_slider_value_changed"]
 [connection signal="toggled" from="Settings/Vibration/Vibration" to="." method="_on_vibration_toggled"]
 [connection signal="pressed" from="Settings/Back" to="." method="_on_back_pressed"]

@@ -3,6 +3,7 @@ extends Control
 @onready var width_value := $Settings/Width/Value
 @onready var height_value := $Settings/Height/Value
 @onready var bombs_value := $Settings/Bombs/Value
+@onready var speed_value := $Settings/Speed/Value
 
 @onready var height_slider := $Settings/Height/HeightSlider
 @onready var width_slider := $Settings/Width/WidthSlider
@@ -76,3 +77,7 @@ func _on_custom_pressed() -> void:
 
 func _on_vibration_toggled(toggled_on: bool) -> void:
 	GameSettings.vibration = toggled_on
+
+func _on_speed_slider_value_changed(value: float) -> void:
+	GameSettings.speed = int(value)
+	speed_value.text = "%2d" % GameSettings.speed
