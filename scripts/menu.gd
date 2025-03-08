@@ -24,7 +24,7 @@ func press_custom_if_not() -> void:
 		$Settings/Presets/Custom.button_pressed = true
 
 func _on_play_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/game.tscn")
+	get_tree().change_scene_to_file("res://scenes/game_2d.tscn")
 
 func _on_settings_pressed() -> void:
 	$Buttons.visible = false

@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dlgs1fibirnij"]
 
-[ext_resource type="Script" path="res://scripts/end.gd" id="1_7fa1g"]
+[ext_resource type="Script" uid="uid://x4yl3dp233s5" path="res://scripts/end.gd" id="1_7fa1g"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_c362g"]
 font_size = 64

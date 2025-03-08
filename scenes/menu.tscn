@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dcwvbecb6eimq"]
 
-[ext_resource type="Script" path="res://scripts/menu.gd" id="1_6wwdr"]
+[ext_resource type="Script" uid="uid://37yn5vbyj7y6" path="res://scripts/menu.gd" id="1_6wwdr"]
 [ext_resource type="ButtonGroup" uid="uid://76f1lrmgucw7" path="res://assets/difficulty_group.tres" id="2_jkig2"]
 
 [node name="Menu" type="Control"]

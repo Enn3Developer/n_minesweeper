@@ -7,7 +7,7 @@ func _ready() -> void:
 	state_label.text = state_text
 
 func _on_play_again_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/game.tscn")
+	get_tree().change_scene_to_file("res://scenes/game_2d.tscn")
 
 func _on_return_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/menu.tscn")
