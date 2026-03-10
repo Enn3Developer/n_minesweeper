@@ -1,10 +1,9 @@
-extends Camera3D
+extends Camera2D
 
 @export var speed := 25.0
 @export var touch_speed := 2.5
 
-var zoom := 1.0
-var old_zoom := 1.0
+var old_zoom := zoom
 var touch_movement := Vector2.ZERO
 
 func _process(delta: float) -> void:
@@ -20,16 +19,16 @@ func _process(delta: float) -> void:
 	var total := movement.normalized() * speed * delta * zoom
 	var touch_total := touch_movement * touch_speed * delta * zoom
 	position.x += total.x + touch_total.x
-	position.z += total.y + touch_total.y
+	position.y += total.y + touch_total.y
 	touch_movement = Vector2.ZERO
 	
 	if zoom != old_zoom:
 		old_zoom = zoom
-		position.y = 15.0 * zoom
-		if position.y < 2.0:
-			position.y = 2.0
-		elif position.y > 100.0:
-			position.y = 100.0
+		#position.y = 15.0 * zoom
+		#if position.y < 2.0:
+			#position.y = 2.0
+		#elif position.y > 100.0:
+			#position.y = 100.0
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:

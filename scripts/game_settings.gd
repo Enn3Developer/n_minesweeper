@@ -29,7 +29,7 @@ var emulate_mouse := true
 var vibration := true
 
 func _ready() -> void:
-	Logger.add_appender(FileAppender.new("user://latest.log"))
+	GSLogger.add_appender(FileAppender.new("user://latest.log"))
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch and emulate_mouse:

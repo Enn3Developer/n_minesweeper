@@ -3,8 +3,8 @@ extends Node2D
 # TODO: Add remaining nodes
 @onready var mesh := $MultiMeshInstance2D
 @onready var camera := $Camera2D
-@onready var time_label := $Camera2D/Stats/Time
-@onready var flags_label := $Camera2D/Stats/Flags
+@onready var time_label := $UI/Background/Stats/Time
+@onready var flags_label := $UI/Background/Stats/Flags
 
 @export var scene_path: String
 @export var current_scene_path: String
@@ -23,9 +23,10 @@ var start := 0
 var losing := false
 
 func _ready() -> void:
-	height = 20
-	width = 20
-	bombs = 40
+	height = GameSettings.height
+	width = GameSettings.width
+	bombs = GameSettings.bombs
+	flags_label.text = str(GameSettings.bombs - flagged) + " Flags"
 	mesh.multimesh.instance_count = width * height
 	for y in range(height):
 		for x in range(width):
@@ -51,7 +52,7 @@ func _process(delta: float) -> void:
 		var time := (Time.get_ticks_msec() - start) / 1000.0
 		var minutes: int = floorf(time / 60.0)
 		var seconds := int(floorf(time)) % 60
-#		time_label.text = "%d:%02d" % [minutes, seconds]
+		time_label.text = "%d:%02d" % [minutes, seconds]
 	if Input.is_action_just_pressed("reset"):
 		reset()
 
@@ -72,7 +73,7 @@ func _area_on_input_event(viewport: Viewport, input_event: InputEvent, shape_idx
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventSingleScreenTap:
-		Logger.info("received tap input")
+		GSLogger.info("received tap input")
 		var touch_event: InputEventSingleScreenTap = event
 		var mouse_event := InputEventMouseButton.new()
 		mouse_event.pressed = true
@@ -83,7 +84,7 @@ func _input(event: InputEvent) -> void:
 		new_event.pressed = false
 		get_viewport().push_input(new_event, true)
 	elif event is InputEventSingleScreenLongPress:
-		Logger.info("received long press input")
+		GSLogger.info("received long press input")
 		var touch_event: InputEventSingleScreenLongPress = event
 		var mouse_event := InputEventMouseButton.new()
 		mouse_event.pressed = true
@@ -95,15 +96,15 @@ func _input(event: InputEvent) -> void:
 		get_viewport().push_input(new_event, true)
 
 func click_show(position: Vector2i):
-	Logger.info("received show input: " + str(position))
+	GSLogger.info("received show input: " + str(position))
 	var index := position.y * width + position.x
 	if not generated:
 		generate_grid(position)
-		$Camera2D/StartGame.visible = false
+		$UI/StartGame.visible = false
 #		$AnimationPlayer.stop()
 	if flagged_grid.decode_s8(index) == 1: return
 	if grid.decode_s8(index) == -1:
-		Logger.info("clicked on bomb")
+		GSLogger.info("clicked on bomb")
 		prepare_lose()
 		if GameSettings.vibration: Input.vibrate_handheld(200, 0.7)
 		return
@@ -111,7 +112,7 @@ func click_show(position: Vector2i):
 	if GameSettings.vibration: Input.vibrate_handheld(500, 1.0)
 
 func click_flag(position: Vector2i):
-	Logger.info("received flag input: " + str(position))
+	GSLogger.info("received flag input: " + str(position))
 	if not generated: return
 	var index := position.y * width + position.x
 	if showed_grid.decode_s8(index) == 1: return
@@ -119,7 +120,7 @@ func click_flag(position: Vector2i):
 	if GameSettings.vibration: Input.vibrate_handheld(500, 1.0)
 
 func generate_grid(click_position: Vector2i):
-	Logger.info("generating grid")
+	GSLogger.info("generating grid")
 	grid = PackedByteArray()
 	showed_grid = PackedByteArray()
 	flagged_grid = PackedByteArray()
@@ -149,7 +150,7 @@ func generate_grid(click_position: Vector2i):
 		bombs -= 1
 	generated = true
 	start = Time.get_ticks_msec()
-	Logger.info("grid generated")
+	GSLogger.info("grid generated")
 
 func show_cell_and_neighbours(cell_position: Vector2i):
 	var positions: Array[Vector2i] = []
@@ -207,7 +208,7 @@ func flag_cell(cell_position: Vector2i):
 		flagged -= 1
 		cell = 0.0
 	flagged_grid.encode_s8(index, value)
-	#flags_label.text = str(GameSettings.bombs - flagged) + " Flags"
+	flags_label.text = str(GameSettings.bombs - flagged) + " Flags"
 	mesh.multimesh.set_instance_custom_data(index, Color(0.0, cell, 0.0, 0.0))
 
 func prepare_lose():
